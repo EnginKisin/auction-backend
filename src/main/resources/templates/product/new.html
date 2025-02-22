@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Yeni Ürün Ekle</title>
+</head>
+<body>
+    <h1>Yeni Ürün Ekle</h1>
+
+    <form th:action="@{/products/new}" method="post">
+        <div>
+            <label for="name">Ürün Adı:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="description">Açıklama:</label>
+            <textarea id="description" name="description" required></textarea>
+        </div>
+        <div>
+            <label for="price">Fiyat:</label>
+            <input type="number" id="price" name="price" required>
+        </div>
+        <button type="submit">Ekle</button>
+    </form>
+</body>
+</html>

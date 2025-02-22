@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kayıt Ol</title>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <h1>Kayıt Ol</h1>
+    <form action="/register" method="post" th:object="${user}">
+        <label for="email">E-posta:</label>
+        <input type="email" id="email" name="email" th:value="*{email}" required>
+        <br>
+        <label for="password">Şifre:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <label for="confirmPassword">Şifre Tekrarı:</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required>
+        <br>
+
+        <div id="card-element">
+            
+        </div>
+
+        <div id="card-errors" role="alert"></div>
+        <br>
+        <button type="submit">Kayıt Ol</button>
+    </form>
+
+    <div th:if="${error}">
+        <p style="color:red;" th:text="${error}"></p>
+    </div>
+
+    <script>
+        var stripe = Stripe('pk_test_51NCV4pEu0lkggKNUU56D0ALtyPvKwZ2RhM22BPnlb37KBYtXDx32PldBOmxblQo6BIxWe4mR0PXqFt9o1TLT0jyd00HWqTU7Oz');
+        var elements = stripe.elements();
+        var card = elements.create('card');
+        card.mount('#card-element');
+
+        var form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            stripe.createToken(card).then(function(result) {
+                if (result.error) {
+                    var errorElement = document.getElementById('card-errors');
+                    errorElement.textContent = result.error.message;
+                } else {
+                    var tokenInput = document.createElement('input');
+                    tokenInput.setAttribute('type', 'hidden');
+                    tokenInput.setAttribute('name', 'cardToken');
+                    tokenInput.setAttribute('value', result.token.id);
+                    form.appendChild(tokenInput);
+                    form.submit();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
