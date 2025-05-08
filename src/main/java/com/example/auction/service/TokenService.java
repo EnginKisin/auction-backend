@@ -33,6 +33,11 @@ public class TokenService {
     }
 
     public String generateToken(String email) {
+
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("E-posta adresi geçersiz.");
+        }
+
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
@@ -52,17 +57,20 @@ public class TokenService {
             Date expiration = claims.getExpiration();
             return expiration.after(new Date());
         } catch (Exception e) {
-            System.out.println("Token doğrulama hatası: " + e.getMessage());
-            return false;
+            throw new IllegalArgumentException("Token geçersiz veya süresi dolmuş.");
         }
     }
 
     public String getEmailFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.getSubject();
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Token'dan e-posta alınamadı.");
+        }
     }
 }

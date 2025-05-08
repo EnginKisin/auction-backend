@@ -29,6 +29,10 @@ public class Auction {
     @JoinColumn(name = "highest_bidder_id")
     private User highestBidder;
 
+    @ManyToOne
+    @JoinColumn(name = "duration_type_id", nullable = false)
+    private DurationType durationType;
+
     @Column(nullable = false)
     private LocalDateTime startTime;
 
@@ -88,6 +92,14 @@ public class Auction {
 
     public void setHighestBidder(User highestBidder) {
         this.highestBidder = highestBidder;
+    }
+
+    public DurationType getDurationType() {
+        return durationType;
+    }
+
+    public DurationType setDurationType(DurationType durationType) {
+        return this.durationType = durationType;
     }
 
     public LocalDateTime getStartTime() {

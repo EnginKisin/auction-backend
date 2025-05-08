@@ -2,8 +2,8 @@ package com.example.auction.controller;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.auction.common.response.ResponseHandler;
 import com.example.auction.dto.AuctionDTO;
-import com.example.auction.dto.BidDTO;
+//import com.example.auction.dto.BidDTO;
 import com.example.auction.model.Auction;
 import com.example.auction.model.Bid;
 import com.example.auction.model.Product;
@@ -29,14 +30,15 @@ import com.example.auction.service.UserService;
 @Controller
 @RequestMapping("/api/auctions")
 public class AuctionController {
-    
+
     private final AuctionService auctionService;
     private final BidService bidService;
     private final UserService userService;
     private final TokenService tokenService;
     private final ProductService productService;
 
-    public AuctionController(AuctionService auctionService, BidService bidService, UserService userService, TokenService tokenService, ProductService productService) {
+    public AuctionController(AuctionService auctionService, BidService bidService, UserService userService,
+            TokenService tokenService, ProductService productService) {
         this.auctionService = auctionService;
         this.bidService = bidService;
         this.userService = userService;
@@ -45,113 +47,91 @@ public class AuctionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AuctionDTO>> listAuctions(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> listAuctions(@RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseEntity.status(401).build();
+            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
         }
 
         List<Auction> auctions = auctionService.getActiveAuctions();
         List<AuctionDTO> auctionDTOs = auctions.stream().map(this::convertToDTO).toList();
-        return ResponseEntity.ok(auctionDTOs);
+        return ResponseHandler.success(auctionDTOs, null, HttpStatus.OK);
     }
 
-    // @PostMapping
-    // public ResponseEntity<Auction> createAuction(@RequestBody Auction auction, @RequestHeader("Authorization") String token) {
-    //     String email = getEmailFromToken(token);
-    //     if (email == null) {
-    //         return ResponseEntity.status(401).build();
-    //     }
-
-    //     User owner = userService.findUserByEmail(email);
-    //     auction.setOwner(owner);
-
-    //     Auction createdAuction = auctionService.createAuction(auction);
-    //     return ResponseEntity.status(201).body(createdAuction);
-    // }
-
-
     @PostMapping
-    public ResponseEntity<AuctionDTO> createAuction(@RequestBody Map<String, Object> requestBody, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> createAuction(@RequestBody Map<String, Object> requestBody,
+            @RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseEntity.status(401).build();
+            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
         }
 
         Long productId = Long.valueOf(requestBody.get("product_id").toString());
         Product product = productService.getProductById(productId);
-        if (product == null) {
-            return ResponseEntity.status(404).build();
-        }
 
         Auction auction = new Auction();
         auction.setProduct(product);
         auction.setStartingPrice(Double.valueOf(requestBody.get("startingPrice").toString()));
-        auction.setIsActive((Boolean) requestBody.get("isActive"));
+        Long durationTypeId = Long.valueOf(requestBody.get("durationTypeId").toString());
 
         User owner = userService.findUserByEmail(email);
         auction.setOwner(owner);
 
-        Auction createdAuction = auctionService.createAuction(auction);
-        AuctionDTO createAuctionDTO = convertToDTO(createdAuction);
-        return ResponseEntity.status(201).body(createAuctionDTO);
+        String resultMessage = auctionService.createAuction(auction, durationTypeId);
+        return ResponseHandler.success(null, resultMessage, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AuctionDTO> getAuctionDetails(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getAuctionDetails(@PathVariable Long id, @RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseEntity.status(401).build();
+            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
         }
 
-        Optional<Auction> auction = auctionService.getAuctionById(id);
-        if (auction.isPresent()) {
-            AuctionDTO auctionDTO = convertToDTO(auction.get());
-            return ResponseEntity.ok(auctionDTO);
-        }
-        return ResponseEntity.status(404).build();
+        Auction auction = auctionService.getAuctionById(id);
+        AuctionDTO auctionDTO = convertToDTO(auction);
+        return ResponseHandler.success(auctionDTO, null, HttpStatus.OK);
     }
 
     @PostMapping("/{id}/bids")
-    public ResponseEntity<String> placeBid(@PathVariable Long id, @RequestBody Bid bid, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> placeBid(@PathVariable Long id, @RequestBody Bid bid,
+            @RequestHeader("Authorization") String token) {
+
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseEntity.status(401).build();
+            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
         }
 
         User bidder = userService.findUserByEmail(email);
         bid.setBidder(bidder);
 
-        String response = bidService.placeBid(id, bid);
-        if (response.equals("Bid placed successfully!")) {
-            return ResponseEntity.status(201).body(response);
-        } else {
-            return ResponseEntity.status(400).body(response);
-        }
+        String resultMessage = bidService.placeBid(id, bid);
+        return ResponseHandler.success(null, resultMessage, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}/bids")
-    public ResponseEntity<List<BidDTO>> listBids(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        String email = getEmailFromToken(token);
-        if (email == null) {
-            return ResponseEntity.status(401).build();
-        }
+    // @GetMapping("/{id}/bids")
+    // public ResponseEntity<?> listBids(@PathVariable Long id,
+    // @RequestHeader("Authorization") String token) {
+    // String email = getEmailFromToken(token);
+    // if (email == null) {
+    // return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
+    // }
 
-        List<Bid> bids = bidService.getBidsForAuction(id);
-        List<BidDTO> bidDTOs = bids.stream().map(this::convertToDTO).toList();
-        return ResponseEntity.ok(bidDTOs);
-    }
-
+    // List<Bid> bids = bidService.getBidsForAuction(id);
+    // List<BidDTO> bidDTOs = bids.stream().map(this::convertToDTO).toList();
+    // return ResponseHandler.success(bidDTOs, "Teklifler listelendi.",
+    // HttpStatus.OK);
+    // }
 
     @PutMapping("/{id}/close")
-    public ResponseEntity<Void> closeAuction(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> closeAuction(@PathVariable Long id, @RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseEntity.status(401).build();
+            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
         }
 
-        auctionService.closeAuction(id);
-        return ResponseEntity.noContent().build();
+        String resultMessage = auctionService.closeAuction(id);
+        return ResponseHandler.success(null, resultMessage, HttpStatus.NO_CONTENT);
     }
 
     private String getEmailFromToken(String token) {
@@ -180,30 +160,31 @@ public class AuctionController {
             auctionDTO.setHighestBidderId(null);
         }
 
+        auctionDTO.setDurationTypeId(auction.getDurationType().getId());
         auctionDTO.setStartTime(auction.getStartTime());
         auctionDTO.setEndTime(auction.getEndTime());
         auctionDTO.setIsActive(auction.getIsActive());
         return auctionDTO;
     }
 
-    private BidDTO convertToDTO(Bid bid) {
-        BidDTO bidDTO = new BidDTO();
-        bidDTO.setId(bid.getId());
+    // private BidDTO convertToDTO(Bid bid) {
+    //     BidDTO bidDTO = new BidDTO();
+    //     bidDTO.setId(bid.getId());
 
-        if (bid.getAuction() != null) {
-            bidDTO.setAuctionId(bid.getAuction().getId());
-        } else {
-            bidDTO.setAuctionId(null);
-        }
+    //     if (bid.getAuction() != null) {
+    //         bidDTO.setAuctionId(bid.getAuction().getId());
+    //     } else {
+    //         bidDTO.setAuctionId(null);
+    //     }
 
-        if (bid.getBidder() != null) {
-            bidDTO.setBidderId(bid.getBidder().getId());
-        } else {
-            bidDTO.setBidderId(null);
-        }
+    //     if (bid.getBidder() != null) {
+    //         bidDTO.setBidderId(bid.getBidder().getId());
+    //     } else {
+    //         bidDTO.setBidderId(null);
+    //     }
 
-        bidDTO.setAmount(bid.getAmount());
-        bidDTO.setBidTime(bid.getBidTime());
-        return bidDTO;
-    }
+    //     bidDTO.setAmount(bid.getAmount());
+    //     bidDTO.setBidTime(bid.getBidTime());
+    //     return bidDTO;
+    // }
 }

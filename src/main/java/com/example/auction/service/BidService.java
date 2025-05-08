@@ -3,9 +3,11 @@ package com.example.auction.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.auction.common.exception.NotFoundException;
 import com.example.auction.model.Auction;
 import com.example.auction.model.Bid;
 import com.example.auction.repository.AuctionRepository;
@@ -13,7 +15,7 @@ import com.example.auction.repository.BidRepository;
 
 @Service
 public class BidService {
-    
+
     @Autowired
     private BidRepository bidRepository;
 
@@ -22,14 +24,18 @@ public class BidService {
 
     public String placeBid(Long auctionId, Bid bid) {
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() -> new IllegalArgumentException("Auction not found"));
+                .orElseThrow(() -> new NotFoundException("Açık artırma bulunamadı."));
 
         if (!auction.getIsActive()) {
-            return "Auction is no longer active.";
+            throw new IllegalArgumentException("Açık artırma artık aktif değil.");
         }
 
-        if (bid.getAmount() <= (auction.getHighestBid() == null ? auction.getStartingPrice() : auction.getHighestBid())) {
-            return "Bid must be higher than the current highest bid.";
+        double currentHighest = auction.getHighestBid() == null
+                ? auction.getStartingPrice()
+                : auction.getHighestBid();
+
+        if (bid.getAmount() <= currentHighest) {
+            throw new IllegalArgumentException("Teklif mevcut en yüksek tekliften büyük olmalıdır.");
         }
 
         bid.setAuction(auction);
@@ -39,17 +45,25 @@ public class BidService {
 
         bidRepository.save(bid);
         auctionRepository.save(auction);
-        return "Bid placed successfully!";
+
+        return "Teklif başarıyla oluşturuldu.";
     }
 
-    public List<Bid> getBidsForAuction(Long auctionId) {
-        return bidRepository.findByAuction_Id(auctionId);
-    }
+    // public Bid getHighestBid(Long auctionId) {
+    //     List<Bid> bids = bidRepository.findByAuctionId(auctionId);
+    //     if (bids == null || bids.isEmpty()) {
+    //         throw new IllegalArgumentException("Açık artırmada teklif bulunamadı.");
+    //     }
+    //     return bids.stream()
+    //             .max((b1, b2) -> Double.compare(b1.getAmount(), b2.getAmount()))
+    //             .orElseThrow(() -> new NotFoundException("Açık artırmada en yüksek teklif bulunamadı."));
+    // }
 
-    public Bid getHighestBid(Long auctionId) {
-        return bidRepository.findByAuction_Id(auctionId).stream()
-                .max((b1, b2) -> Double.compare(b1.getAmount(), b2.getAmount()))
-                .orElse(null);
-    }
+    // public List<Bid> getBidsForAuction(Long auctionId) {
+    //     if (auctionId == null || auctionId <= 0) {
+    //         throw new NotFoundException("Geçersiz açık artırma id.");
+    //     }
+    //     return bidRepository.findByAuctionId(auctionId);
+    // }
 
 }

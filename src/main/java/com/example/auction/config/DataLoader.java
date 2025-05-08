@@ -5,7 +5,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.example.auction.model.DurationType;
 import com.example.auction.model.Role;
+import com.example.auction.repository.DurationTypeRepository;
 import com.example.auction.repository.RoleRepository;
 
 @Configuration
@@ -14,15 +16,14 @@ public class DataLoader  {
     @Autowired
     private RoleRepository roleRepository;
 
-    // @Autowired
-    // private UserRepository userRepository;
+    @Autowired
+    private DurationTypeRepository durationTypeRepository;
 
     @Bean
     public CommandLineRunner loadData() {
         return args -> {
             createRoles();
-
-            //createSuperAdmin();
+            createDurationTypes();
         };
     }
 
@@ -38,23 +39,14 @@ public class DataLoader  {
         }
     }
 
+    private void createDurationTypes() {
+        if (durationTypeRepository.count() == 0) {
+            DurationType shortDuration = new DurationType("Short", 30);  // 30 dakika
+            DurationType longDuration = new DurationType("Long", 1440);  // 24 saat (1440 dakika)
 
-    // private void createSuperAdmin() {
-    //     if (userRepository.findByUsername("superadmin").isEmpty()) {
-    //         Set<Role> roles = new HashSet<>();
-    //         Role superAdminRole = roleRepository.findByName("superadmin");
-    //         roles.add(superAdminRole);
-    
-    //         User superAdminUser = new User();
-    //         superAdminUser.setUsername("superadmin");
-    
-    //         String hashedPassword = BCrypt.hashpw("superadmin", BCrypt.gensalt());
-    //         superAdminUser.setPassword(hashedPassword);
-    
-    //         superAdminUser.setRoles(roles);
-    
-    //         userRepository.save(superAdminUser);
-    //     }
-    // }
+            durationTypeRepository.save(shortDuration);
+            durationTypeRepository.save(longDuration);
+        }
+    }
     
 }

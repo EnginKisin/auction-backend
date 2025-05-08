@@ -9,6 +9,7 @@ public class AuctionDTO {
     private Double startingPrice;
     private Double highestBid;
     private Long highestBidderId;
+    private Long durationTypeId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Boolean isActive;
@@ -59,6 +60,14 @@ public class AuctionDTO {
 
     public void setHighestBidderId(Long highestBidderId) {
         this.highestBidderId = highestBidderId;
+    }
+
+    public Long getDurationTypeId() {
+        return durationTypeId;
+    }
+
+    public void setDurationTypeId(Long durationTypeId) {
+        this.durationTypeId = durationTypeId;
     }
 
     public LocalDateTime getStartTime() {

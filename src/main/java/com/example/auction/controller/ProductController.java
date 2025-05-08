@@ -1,5 +1,6 @@
 package com.example.auction.controller;
 
+import com.example.auction.common.response.ResponseHandler;
 import com.example.auction.dto.ProductDTO;
 import com.example.auction.model.Product;
 import com.example.auction.model.User;
@@ -7,6 +8,7 @@ import com.example.auction.service.ProductService;
 import com.example.auction.service.TokenService;
 import com.example.auction.service.UserService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -28,66 +30,55 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> listProducts(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> listProducts(@RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseEntity.status(401).build();
+            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
         }
 
         User owner = userService.findUserByEmail(email);
         List<Product> products = productService.getProductsByOwner(owner);
         List<ProductDTO> productDTOs = products.stream().map(this::convertToDTO).toList();
-        return ResponseEntity.ok(productDTOs);
+        return ResponseHandler.success(productDTOs, null, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody Product product, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> createProduct(@RequestBody Product product, @RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseEntity.status(401).build();
+            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
         }
 
         User owner = userService.findUserByEmail(email);
         product.setOwner(owner);
-        Product savedProduct = productService.saveProduct(product);
-        ProductDTO savedProductDTO = convertToDTO(savedProduct);
-        return ResponseEntity.status(201).body(savedProductDTO);
+
+        String resultMessage = productService.saveProduct(product);
+        return ResponseHandler.success(null, resultMessage, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody Product product, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product product, @RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseEntity.status(401).build();
+            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
         }
 
         User owner = userService.findUserByEmail(email);
         product.setId(id);
         product.setOwner(owner);
-        Product updatedProduct = productService.saveProduct(product);
-        ProductDTO updatedProductDTO = convertToDTO(updatedProduct);
-        return ResponseEntity.ok(updatedProductDTO);
+        String resultMessage = productService.saveProduct(product);
+        return ResponseHandler.success(null, resultMessage, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id, @RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseEntity.status(401).build();
+            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
         }
 
-        try {
-            Product product = productService.getProductById(id);
-
-            if (product.getOwner().getEmail().equals(email)) {
-                productService.deleteProduct(id);
-                return ResponseEntity.noContent().build();
-            } else {
-                return ResponseEntity.status(403).build();
-            }
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).build();
-        }
+        String resultMessage = productService.deleteProduct(id, email);
+        return ResponseHandler.success(null, resultMessage, HttpStatus.NO_CONTENT);
     }
 
     private String getEmailFromToken(String token) {

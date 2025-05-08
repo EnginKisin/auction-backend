@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.auction.model.Bid;
 
 public interface BidRepository extends JpaRepository<Bid, Long> {
-    List<Bid> findByAuction_Id(Long auctionId);
+    List<Bid> findByAuctionId(Long auctionId);
 }

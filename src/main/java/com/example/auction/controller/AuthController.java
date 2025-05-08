@@ -1,9 +1,11 @@
 package com.example.auction.controller;
 
+import com.example.auction.common.response.ResponseHandler;
 import com.example.auction.model.User;
 import com.example.auction.service.TokenService;
 import com.example.auction.service.UserService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,30 +30,20 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User user) {
         User loggedInUser = userService.validateUser(user.getEmail(), user.getPassword());
-        if (loggedInUser != null) {
-            String token = tokenService.generateToken(loggedInUser.getEmail());
-            return ResponseEntity.ok().body(token);
-        }
-        return ResponseEntity.status(401).body("E-posta veya şifre hatalı.");
+        String token = tokenService.generateToken(loggedInUser.getEmail());
+        return ResponseHandler.success(token, "Token başarıyla alındı.", HttpStatus.OK);
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user, @RequestParam String cardToken) {
-        try {
-            userService.registerUser(user, cardToken);
-            return ResponseEntity.ok().body("Kayıt başarılı!");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Bir hata oluştu: " + e.getMessage());
-        }
+        userService.registerUser(user, cardToken);
+        return ResponseHandler.success(null, "Kullanıcı başarıyla kaydedildi.", HttpStatus.OK);
     }
 
     @GetMapping("/validate-token")
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         boolean isValid = tokenService.validateToken(token);
-        return ResponseEntity.ok().body(isValid ? "Geçerli token." : "Geçersiz token.");
+        return ResponseHandler.success(null, isValid ? "Geçerli token." : "Geçersiz token.", HttpStatus.OK);
     }
 }
-
