@@ -1,13 +1,11 @@
 package com.example.auction.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.auction.common.exception.NotFoundException;
+import com.example.auction.common.message.MessageCode;
 import com.example.auction.model.Auction;
 import com.example.auction.model.Bid;
 import com.example.auction.repository.AuctionRepository;
@@ -24,10 +22,10 @@ public class BidService {
 
     public String placeBid(Long auctionId, Bid bid) {
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() -> new NotFoundException("Açık artırma bulunamadı."));
+                .orElseThrow(() -> new NotFoundException(MessageCode.AUCTION_NOT_FOUND.getMessage()));
 
         if (!auction.getIsActive()) {
-            throw new IllegalArgumentException("Açık artırma artık aktif değil.");
+            throw new IllegalArgumentException(MessageCode.AUCTION_INACTIVE.getMessage());
         }
 
         double currentHighest = auction.getHighestBid() == null
@@ -35,7 +33,7 @@ public class BidService {
                 : auction.getHighestBid();
 
         if (bid.getAmount() <= currentHighest) {
-            throw new IllegalArgumentException("Teklif mevcut en yüksek tekliften büyük olmalıdır.");
+            throw new IllegalArgumentException(MessageCode.BID_TOO_LOW.getMessage());
         }
 
         bid.setAuction(auction);
@@ -46,22 +44,22 @@ public class BidService {
         bidRepository.save(bid);
         auctionRepository.save(auction);
 
-        return "Teklif başarıyla oluşturuldu.";
+        return MessageCode.BID_SUCCESS.getMessage();
     }
 
     // public Bid getHighestBid(Long auctionId) {
     //     List<Bid> bids = bidRepository.findByAuctionId(auctionId);
     //     if (bids == null || bids.isEmpty()) {
-    //         throw new IllegalArgumentException("Açık artırmada teklif bulunamadı.");
+    //         throw new IllegalArgumentException(MessageCode.BID_NOT_FOUND.getMessage());
     //     }
     //     return bids.stream()
     //             .max((b1, b2) -> Double.compare(b1.getAmount(), b2.getAmount()))
-    //             .orElseThrow(() -> new NotFoundException("Açık artırmada en yüksek teklif bulunamadı."));
+    //             .orElseThrow(() -> new NotFoundException(MessageCode.HIGHEST_BID_NOT_FOUND.getMessage()));
     // }
 
     // public List<Bid> getBidsForAuction(Long auctionId) {
     //     if (auctionId == null || auctionId <= 0) {
-    //         throw new NotFoundException("Geçersiz açık artırma id.");
+    //         throw new NotFoundException(MessageCode.INVALID_AUCTION_ID.getMessage());
     //     }
     //     return bidRepository.findByAuctionId(auctionId);
     // }

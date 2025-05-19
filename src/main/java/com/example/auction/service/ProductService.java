@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.auction.common.exception.NotFoundException;
+import com.example.auction.common.message.MessageCode;
 import com.example.auction.model.Product;
 import com.example.auction.model.User;
 import com.example.auction.repository.ProductRepository;
@@ -22,23 +23,23 @@ public class ProductService {
 
     public String saveProduct(Product product) {
         productRepository.save(product);
-        return "Ürün başarıyla kaydedildi.";
+        return MessageCode.PRODUCT_SUCCESS.getMessage();
     }
 
     public Product getProductById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Ürün bulunamadı."));
+                .orElseThrow(() -> new NotFoundException(MessageCode.PRODUCT_NOT_FOUND.getMessage()));
     }
 
     public String deleteProduct(Long id, String email) {
         Product product = getProductById(id);
     
         if (!product.getOwner().getEmail().equals(email)) {
-            throw new IllegalStateException("Bu ürünü silme yetkiniz yok.");
+            throw new IllegalStateException(MessageCode.PRODUCT_DELETE_UNAUTHORIZED.getMessage());
         }
     
         productRepository.delete(product);
-        return "Ürün başarıyla silindi.";
+        return MessageCode.PRODUCT_DELETED.getMessage();
     }
 
     public List<Product> getAllProducts() {

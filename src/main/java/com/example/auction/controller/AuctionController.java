@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.auction.common.message.MessageCode;
 import com.example.auction.common.response.ResponseHandler;
 import com.example.auction.dto.AuctionDTO;
 //import com.example.auction.dto.BidDTO;
@@ -50,7 +51,7 @@ public class AuctionController {
     public ResponseEntity<?> listAuctions(@RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
+            return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         List<Auction> auctions = auctionService.getActiveAuctions();
@@ -63,7 +64,7 @@ public class AuctionController {
             @RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
+            return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         Long productId = Long.valueOf(requestBody.get("product_id").toString());
@@ -85,7 +86,7 @@ public class AuctionController {
     public ResponseEntity<?> getAuctionDetails(@PathVariable Long id, @RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
+            return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         Auction auction = auctionService.getAuctionById(id);
@@ -99,7 +100,7 @@ public class AuctionController {
 
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
+            return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         User bidder = userService.findUserByEmail(email);
@@ -114,12 +115,12 @@ public class AuctionController {
     // @RequestHeader("Authorization") String token) {
     // String email = getEmailFromToken(token);
     // if (email == null) {
-    // return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
+    // return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
     // }
 
     // List<Bid> bids = bidService.getBidsForAuction(id);
     // List<BidDTO> bidDTOs = bids.stream().map(this::convertToDTO).toList();
-    // return ResponseHandler.success(bidDTOs, "Teklifler listelendi.",
+    // return ResponseHandler.success(bidDTOs, MessageCode.BIDS_LISTED.getMessage(),
     // HttpStatus.OK);
     // }
 
@@ -127,7 +128,7 @@ public class AuctionController {
     public ResponseEntity<?> closeAuction(@PathVariable Long id, @RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
+            return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         String resultMessage = auctionService.closeAuction(id);

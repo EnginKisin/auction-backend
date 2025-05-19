@@ -1,5 +1,6 @@
 package com.example.auction.controller;
 
+import com.example.auction.common.message.MessageCode;
 import com.example.auction.common.response.ResponseHandler;
 import com.example.auction.model.User;
 import com.example.auction.service.TokenService;
@@ -31,19 +32,19 @@ public class AuthController {
     public ResponseEntity<?> loginUser(@RequestBody User user) {
         User loggedInUser = userService.validateUser(user.getEmail(), user.getPassword());
         String token = tokenService.generateToken(loggedInUser.getEmail());
-        return ResponseHandler.success(token, "Token başarıyla alındı.", HttpStatus.OK);
+        return ResponseHandler.success(token, MessageCode.TOKEN_SUCCESS.getMessage(), HttpStatus.OK);
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user, @RequestParam String cardToken) {
         userService.registerUser(user, cardToken);
-        return ResponseHandler.success(null, "Kullanıcı başarıyla kaydedildi.", HttpStatus.OK);
+        return ResponseHandler.success(null, MessageCode.USER_REGISTRATION_SUCCESS.getMessage(), HttpStatus.OK);
     }
 
     @GetMapping("/validate-token")
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         boolean isValid = tokenService.validateToken(token);
-        return ResponseHandler.success(null, isValid ? "Geçerli token." : "Geçersiz token.", HttpStatus.OK);
+        return ResponseHandler.success(null, isValid ? MessageCode.VALID_TOKEN.getMessage() : MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.OK);
     }
 }

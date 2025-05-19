@@ -8,6 +8,8 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.example.auction.common.message.MessageCode;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -35,7 +37,7 @@ public class TokenService {
     public String generateToken(String email) {
 
         if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("E-posta adresi geçersiz.");
+            throw new IllegalArgumentException(MessageCode.INVALID_EMAIL.getMessage());
         }
 
         return Jwts.builder()
@@ -57,7 +59,7 @@ public class TokenService {
             Date expiration = claims.getExpiration();
             return expiration.after(new Date());
         } catch (Exception e) {
-            throw new IllegalArgumentException("Token geçersiz veya süresi dolmuş.");
+            throw new IllegalArgumentException(MessageCode.TOKEN_EXPIRED_OR_INVALID.getMessage());
         }
     }
 
@@ -70,7 +72,7 @@ public class TokenService {
                     .getBody();
             return claims.getSubject();
         } catch (Exception e) {
-            throw new IllegalArgumentException("Token'dan e-posta alınamadı.");
+            throw new IllegalArgumentException(MessageCode.EMAIL_NOT_FOUND_IN_TOKEN.getMessage());
         }
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.auction.common.exception.NotFoundException;
+import com.example.auction.common.message.MessageCode;
 import com.example.auction.model.Auction;
 import com.example.auction.model.DurationType;
 import com.example.auction.repository.AuctionRepository;
@@ -23,7 +24,7 @@ public class AuctionService {
     public String createAuction(Auction auction, Long durationTypeId) {
         boolean exists = auctionRepository.findByProductId(auction.getProduct().getId()).isPresent();
         if (exists) {
-            throw new IllegalStateException("Bu ürüne ait zaten bir açık artırma mevcut.");
+            throw new IllegalStateException(MessageCode.AUCTION_ALREADY_EXISTS.getMessage());
         }
 
         auction.setStartTime(LocalDateTime.now());
@@ -33,7 +34,7 @@ public class AuctionService {
         auction.setIsActive(true);
 
         auctionRepository.save(auction);
-        return "Açık artırma başarıyla oluşturuldu.";
+        return MessageCode.AUCTION_CREATED_SUCCESS.getMessage();
     }
 
     public List<Auction> getActiveAuctions() {
@@ -42,19 +43,19 @@ public class AuctionService {
 
     public Auction getAuctionById(Long id) {
         return auctionRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Açık artırma bulunamadı."));
+                .orElseThrow(() -> new NotFoundException(MessageCode.AUCTION_NOT_FOUND.getMessage()));
     }
 
     public String closeAuction(Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() -> new NotFoundException("Açık artırma bulunamadı."));
+                .orElseThrow(() -> new NotFoundException(MessageCode.AUCTION_NOT_FOUND.getMessage()));
 
         if (!auction.getIsActive()) {
-            throw new IllegalStateException("Açık artırma zaten kapalı.");
+            throw new IllegalStateException(MessageCode.AUCTION_ALREADY_CLOSED.getMessage());
         }
 
         auction.setIsActive(false);
         auctionRepository.save(auction);
-        return "Açık artırma başarıyla kapatıldı.";
+        return MessageCode.AUCTION_CLOSED_SUCCESS.getMessage();
     }
 }

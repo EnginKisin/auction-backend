@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.auction.common.exception.NotFoundException;
 import com.example.auction.common.exception.StripeProcessException;
+import com.example.auction.common.message.MessageCode;
 import com.example.auction.model.Role;
 import com.example.auction.model.User;
 import com.example.auction.repository.RoleRepository;
@@ -30,25 +31,25 @@ public class UserService {
 
     public User validateUser(String email, String password) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("E-posta adresi geçersiz."));
+                .orElseThrow(() -> new IllegalArgumentException(MessageCode.INVALID_EMAIL.getMessage()));
         
         boolean isPasswordCorrect = BCrypt.checkpw(password, user.getPassword());
         if (!isPasswordCorrect) {
-            throw new IllegalArgumentException("Şifre yanlış.");
+            throw new IllegalArgumentException(MessageCode.INCORRECT_PASSWORD.getMessage());
         }
         return user;
     }
 
     public String registerUser(User user, String cardToken) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Bu e-posta adresi zaten kayıtlı.");
+            throw new IllegalArgumentException(MessageCode.EMAIL_ALREADY_REGISTERED.getMessage());
         }
 
         try {
             String stripeCustomerId = stripeService.createStripeCustomer(user.getEmail(), cardToken);
             user.setStripeCustomerId(stripeCustomerId);
         } catch (StripeException e) {
-            throw new StripeProcessException("Stripe işlemi başarısız oldu" + e);
+            throw new StripeProcessException(MessageCode.STRIPE_ERROR.getMessage() + e);
         }
 
         String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
@@ -64,11 +65,11 @@ public class UserService {
         user.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(user);
-        return "Kullanıcı başarıyla kaydedildi.";
+        return MessageCode.USER_REGISTRATION_SUCCESS.getMessage();
     }
 
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Bu e-posta adresine sahip bir kullanıcı bulunamadı."));
+                .orElseThrow(() -> new NotFoundException(MessageCode.USER_NOT_FOUND.getMessage()));
     }
 }

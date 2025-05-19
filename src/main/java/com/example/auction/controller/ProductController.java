@@ -1,5 +1,6 @@
 package com.example.auction.controller;
 
+import com.example.auction.common.message.MessageCode;
 import com.example.auction.common.response.ResponseHandler;
 import com.example.auction.dto.ProductDTO;
 import com.example.auction.model.Product;
@@ -33,7 +34,7 @@ public class ProductController {
     public ResponseEntity<?> listProducts(@RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
+            return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         User owner = userService.findUserByEmail(email);
@@ -46,7 +47,7 @@ public class ProductController {
     public ResponseEntity<?> createProduct(@RequestBody Product product, @RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
+            return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         User owner = userService.findUserByEmail(email);
@@ -60,7 +61,7 @@ public class ProductController {
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product product, @RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
+            return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         User owner = userService.findUserByEmail(email);
@@ -74,7 +75,7 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable Long id, @RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
-            return ResponseHandler.error("Geçersiz token.", HttpStatus.UNAUTHORIZED);
+            return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         String resultMessage = productService.deleteProduct(id, email);

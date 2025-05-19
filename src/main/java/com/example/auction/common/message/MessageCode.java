@@ -1,0 +1,60 @@
+package com.example.auction.common.message;
+
+public enum MessageCode {
+    // Kullanıcı,token,login,register Mesajları
+    USER_NOT_FOUND("Bu e-posta adresine sahip bir kullanıcı bulunamadı."),
+    USER_REGISTRATION_SUCCESS("Kullanıcı başarıyla kaydedildi."),
+
+    INVALID_TOKEN("Geçersiz token."),
+    VALID_TOKEN("Token geçerli."),
+    TOKEN_SUCCESS("Token başarıyla alındı."),
+    TOKEN_EXPIRED_OR_INVALID("Token geçersiz veya süresi dolmuş."),
+    EMAIL_NOT_FOUND_IN_TOKEN("Token'dan e-posta alınamadı."),
+
+    INVALID_EMAIL("E-posta adresi geçersiz."),
+    INCORRECT_PASSWORD("Şifre yanlış."),
+    EMAIL_ALREADY_REGISTERED("Bu e-posta adresi zaten kayıtlı."),
+
+    // Stripe Mesajları
+    STRIPE_ERROR("Stripe işlemi başarısız oldu."),
+    
+    // Açık Artırma Mesajları
+    AUCTION_NOT_FOUND("Açık artırma bulunamadı."),
+    AUCTION_ALREADY_CLOSED("Açık artırma zaten kapalı."),
+    AUCTION_ALREADY_EXISTS("Bu ürüne ait zaten bir açık artırma mevcut."),
+    AUCTION_INACTIVE("Açık artırma artık aktif değil."),
+    AUCTION_CREATED_SUCCESS("Açık artırma başarıyla oluşturuldu."),
+    AUCTION_CLOSED_SUCCESS("Açık artırma başarıyla kapatıldı."),
+    INVALID_AUCTION_ID("Geçersiz açık artırma id."),
+
+    // Teklif Mesajları
+    BID_SUCCESS("Teklif başarıyla yapıldı."),
+    BID_TOO_LOW("Teklif mevcut en yüksek tekliften büyük olmalıdır."),
+    BID_NOT_FOUND("Açık artırmada teklif bulunamadı."),
+    HIGHEST_BID_NOT_FOUND("Açık artırmada en yüksek teklif bulunamadı."),
+    BIDS_LISTED("Teklifler listelendi."),
+
+    // Ürün Mesajları
+    PRODUCT_SUCCESS("Ürün başarıyla kaydedildi."),
+    PRODUCT_NOT_FOUND("Ürün bulunamadı."),
+    PRODUCT_DELETED("Ürün başarıyla silindi."),
+    PRODUCT_DELETE_UNAUTHORIZED("Bu ürünü silme yetkiniz yok."),
+    
+    // Süre Tipi Mesajları
+    DURATION_TYPE_NOT_FOUND("Süre Tipi bulunamadı!");
+
+    private final String message;
+
+    MessageCode(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String formatMessage(Object... args) {
+        return String.format(message, args);
+    }
+}
+
