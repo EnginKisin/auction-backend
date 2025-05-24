@@ -41,10 +41,10 @@ public class AuthController {
         return ResponseHandler.success(null, MessageCode.USER_REGISTRATION_SUCCESS.getMessage(), HttpStatus.OK);
     }
 
-    @GetMapping("/validate-token")
-    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        boolean isValid = tokenService.validateToken(token);
-        return ResponseHandler.success(null, isValid ? MessageCode.VALID_TOKEN.getMessage() : MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.OK);
-    }
+    // @GetMapping("/validate-token")
+    // public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String authHeader) {
+    //     String token = authHeader.replace("Bearer ", "");
+    //     boolean isValid = tokenService.validateToken(token);
+    //     return ResponseHandler.success(null, isValid ? MessageCode.VALID_TOKEN.getMessage() : MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.OK);
+    // }
 }
