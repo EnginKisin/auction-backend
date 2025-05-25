@@ -51,7 +51,7 @@ public class AuctionService {
                 .orElseThrow(() -> new NotFoundException(MessageCode.AUCTION_NOT_FOUND.getMessage()));
 
         if (!auction.getIsActive()) {
-            throw new IllegalStateException(MessageCode.AUCTION_ALREADY_CLOSED.getMessage());
+            throw new IllegalStateException(MessageCode.AUCTION_INACTIVE.getMessage());
         }
 
         auction.setIsActive(false);

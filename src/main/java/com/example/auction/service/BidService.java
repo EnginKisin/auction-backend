@@ -24,7 +24,8 @@ public class BidService {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new NotFoundException(MessageCode.AUCTION_NOT_FOUND.getMessage()));
 
-        if (!auction.getIsActive()) {
+
+        if (!auction.getIsActive() || LocalDateTime.now().isAfter(auction.getEndTime())) {
             throw new IllegalArgumentException(MessageCode.AUCTION_INACTIVE.getMessage());
         }
 
@@ -48,20 +49,21 @@ public class BidService {
     }
 
     // public Bid getHighestBid(Long auctionId) {
-    //     List<Bid> bids = bidRepository.findByAuctionId(auctionId);
-    //     if (bids == null || bids.isEmpty()) {
-    //         throw new IllegalArgumentException(MessageCode.BID_NOT_FOUND.getMessage());
-    //     }
-    //     return bids.stream()
-    //             .max((b1, b2) -> Double.compare(b1.getAmount(), b2.getAmount()))
-    //             .orElseThrow(() -> new NotFoundException(MessageCode.HIGHEST_BID_NOT_FOUND.getMessage()));
+    // List<Bid> bids = bidRepository.findByAuctionId(auctionId);
+    // if (bids == null || bids.isEmpty()) {
+    // throw new IllegalArgumentException(MessageCode.BID_NOT_FOUND.getMessage());
+    // }
+    // return bids.stream()
+    // .max((b1, b2) -> Double.compare(b1.getAmount(), b2.getAmount()))
+    // .orElseThrow(() -> new
+    // NotFoundException(MessageCode.HIGHEST_BID_NOT_FOUND.getMessage()));
     // }
 
     // public List<Bid> getBidsForAuction(Long auctionId) {
-    //     if (auctionId == null || auctionId <= 0) {
-    //         throw new NotFoundException(MessageCode.INVALID_AUCTION_ID.getMessage());
-    //     }
-    //     return bidRepository.findByAuctionId(auctionId);
+    // if (auctionId == null || auctionId <= 0) {
+    // throw new NotFoundException(MessageCode.INVALID_AUCTION_ID.getMessage());
+    // }
+    // return bidRepository.findByAuctionId(auctionId);
     // }
 
 }

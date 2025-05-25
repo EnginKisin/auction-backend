@@ -20,9 +20,8 @@ public enum MessageCode {
     
     // Açık Artırma Mesajları
     AUCTION_NOT_FOUND("Açık artırma bulunamadı."),
-    AUCTION_ALREADY_CLOSED("Açık artırma zaten kapalı."),
     AUCTION_ALREADY_EXISTS("Bu ürüne ait zaten bir açık artırma mevcut."),
-    AUCTION_INACTIVE("Açık artırma artık aktif değil."),
+    AUCTION_INACTIVE("Açık artırma aktif değil."),
     AUCTION_CREATED_SUCCESS("Açık artırma başarıyla oluşturuldu."),
     AUCTION_CLOSED_SUCCESS("Açık artırma başarıyla kapatıldı."),
     INVALID_AUCTION_ID("Geçersiz açık artırma id."),
