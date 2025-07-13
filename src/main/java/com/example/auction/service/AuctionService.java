@@ -1,10 +1,13 @@
 package com.example.auction.service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.auction.common.exception.NotFoundException;
 import com.example.auction.common.message.MessageCode;
@@ -21,16 +24,32 @@ public class AuctionService {
     @Autowired
     private DurationTypeService durationTypeService;
 
+    @Scheduled(fixedRate = 60000)
+    @Transactional
+    public void closeExpiredAuctions() {
+        List<Auction> activeAuctions = auctionRepository.findByIsActive(true);
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Auction auction : activeAuctions) {
+            if (now.isAfter(auction.getEndTime())) {
+                auction.setIsActive(false);
+                auctionRepository.save(auction);
+            }
+        }
+    }
+
     public String createAuction(Auction auction, Long durationTypeId) {
         boolean exists = auctionRepository.findByProductId(auction.getProduct().getId()).isPresent();
         if (exists) {
             throw new IllegalStateException(MessageCode.AUCTION_ALREADY_EXISTS.getMessage());
         }
 
-        auction.setStartTime(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).plusMinutes(1);
+        auction.setStartTime(now);
+
         DurationType durationType = durationTypeService.getDurationTypeById(durationTypeId);
         auction.setDurationType(durationType);
-        auction.setEndTime(auction.getStartTime().plusMinutes(durationType.getDurationInMinutes()));
+        auction.setEndTime(now.plusMinutes(durationType.getDurationInMinutes()));
         auction.setIsActive(true);
 
         auctionRepository.save(auction);

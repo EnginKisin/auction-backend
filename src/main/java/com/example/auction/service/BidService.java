@@ -3,6 +3,7 @@ package com.example.auction.service;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.auction.common.exception.NotFoundException;
 import com.example.auction.common.message.MessageCode;
@@ -20,6 +21,7 @@ public class BidService {
     @Autowired
     private AuctionRepository auctionRepository;
 
+    @Transactional
     public String placeBid(Long auctionId, Bid bid) {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new NotFoundException(MessageCode.AUCTION_NOT_FOUND.getMessage()));
