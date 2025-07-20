@@ -46,15 +46,28 @@ public class AuctionController {
         this.tokenService = tokenService;
         this.productService = productService;
     }
-
-    @GetMapping
-    public ResponseEntity<?> listAuctions(@RequestHeader("Authorization") String token) {
+    
+    @GetMapping("/active")
+    public ResponseEntity<?> listAllActiveAuctions(@RequestHeader("Authorization") String token) {
         String email = getEmailFromToken(token);
         if (email == null) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
-        List<Auction> auctions = auctionService.getActiveAuctions();
+        List<Auction> auctions = auctionService.getAllActiveAuctions();
+        List<AuctionDTO> auctionDTOs = auctions.stream().map(this::convertToDTO).toList();
+        return ResponseHandler.success(auctionDTOs, null, HttpStatus.OK);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<?> listAuctionsByOwner(@RequestHeader("Authorization") String token) {
+        String email = getEmailFromToken(token);
+        if (email == null) {
+            return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+
+        User owner = userService.findUserByEmail(email);
+        List<Auction> auctions = auctionService.getAuctionsByOwner(owner);
         List<AuctionDTO> auctionDTOs = auctions.stream().map(this::convertToDTO).toList();
         return ResponseHandler.success(auctionDTOs, null, HttpStatus.OK);
     }

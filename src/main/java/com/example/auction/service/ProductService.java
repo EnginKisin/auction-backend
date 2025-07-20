@@ -26,6 +26,22 @@ public class ProductService {
         return MessageCode.PRODUCT_SUCCESS.getMessage();
     }
 
+    public String updateProduct(Long id, Product product, String email) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(MessageCode.PRODUCT_NOT_FOUND.getMessage()));
+
+        if (!existingProduct.getOwner().getEmail().equals(email)) {
+            throw new IllegalStateException(MessageCode.PRODUCT_UPDATE_UNAUTHORIZED.getMessage());
+        }
+
+        existingProduct.setName(product.getName());
+        existingProduct.setDescription(product.getDescription());
+        existingProduct.setPrice(product.getPrice());
+
+        productRepository.save(existingProduct);
+        return MessageCode.PRODUCT_UPDATED.getMessage();
+    }
+
     public Product getProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(MessageCode.PRODUCT_NOT_FOUND.getMessage()));

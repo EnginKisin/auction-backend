@@ -38,6 +38,8 @@ public enum MessageCode {
     PRODUCT_NOT_FOUND("Ürün bulunamadı."),
     PRODUCT_DELETED("Ürün başarıyla silindi."),
     PRODUCT_DELETE_UNAUTHORIZED("Bu ürünü silme yetkiniz yok."),
+    PRODUCT_UPDATED("Ürün başarıyla düzenlendi."),
+    PRODUCT_UPDATE_UNAUTHORIZED("Bu ürünü düzenleme yetkiniz yok."),
     
     // Süre Tipi Mesajları
     DURATION_TYPE_NOT_FOUND("Süre Tipi bulunamadı!");

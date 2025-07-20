@@ -13,6 +13,7 @@ import com.example.auction.common.exception.NotFoundException;
 import com.example.auction.common.message.MessageCode;
 import com.example.auction.model.Auction;
 import com.example.auction.model.DurationType;
+import com.example.auction.model.User;
 import com.example.auction.repository.AuctionRepository;
 
 @Service
@@ -56,8 +57,16 @@ public class AuctionService {
         return MessageCode.AUCTION_CREATED_SUCCESS.getMessage();
     }
 
-    public List<Auction> getActiveAuctions() {
+    // public List<Auction> getAllAuctions() {
+    //     return auctionRepository.findAll();
+    // }
+
+    public List<Auction> getAllActiveAuctions() {
         return auctionRepository.findByIsActive(true);
+    }
+
+    public List<Auction> getAuctionsByOwner(User owner) {
+        return auctionRepository.findByOwner(owner);
     }
 
     public Auction getAuctionById(Long id) {

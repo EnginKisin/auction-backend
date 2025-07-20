@@ -1,11 +1,14 @@
 package com.example.auction.dto;
 
+import java.util.List;
+
 public class ProductDTO {
     private Long id;
     private String name;
     private String description;
     private Double price;
     private Long ownerId;
+    private List<ProductImageDTO> images;
 
     public Long getId() {
         return id;
@@ -45,5 +48,13 @@ public class ProductDTO {
 
     public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public List<ProductImageDTO> getImages() {
+        return images;
+    }
+
+    public void setImages(List<ProductImageDTO> images) {
+        this.images = images;
     }
 }

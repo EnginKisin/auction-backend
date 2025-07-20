@@ -74,4 +74,12 @@ public class Product {
         this.owner = owner;
     }
 
+    public List<ProductImage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<ProductImage> images) {
+        this.images = images;
+    }
+
 }
