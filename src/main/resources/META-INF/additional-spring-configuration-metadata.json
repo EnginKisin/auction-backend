@@ -10,8 +10,13 @@
     "description": "A description for 'jwt.secret-key'"
   },
   {
-    "name": "jwt.expiration-time",
+    "name": "jwt.refresh-token-expiration-ms",
     "type": "java.lang.String",
-    "description": "A description for 'jwt.expiration-time'"
+    "description": "A description for 'jwt.refresh-token-expiration-ms'"
+  },
+  {
+    "name": "jwt.access-token.expiration-ms",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.access-token.expiration-ms'"
   }
 ]}

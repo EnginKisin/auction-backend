@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +21,14 @@ import java.security.Key;
 @Service
 public class TokenService {
 
+    @Autowired
+    private BlacklistedTokenService blacklistedTokenService;
+
     @Value("${jwt.secret-key}")
     private String secretKeyBase64;
 
-    @Value("${jwt.expiration-time}")
-    private long expirationTime;
+    @Value("${jwt.access-token.expiration-ms}")
+    private long accessTokenExpirationMs;
 
     private Key secretKey;
 
@@ -43,17 +47,36 @@ public class TokenService {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationMs))
                 .signWith(secretKey)
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    // public boolean validateToken(String accessToken) {
+    //     try {
+    //         Claims claims = Jwts.parserBuilder()
+    //                 .setSigningKey(secretKey)
+    //                 .build()
+    //                 .parseClaimsJws(accessToken)
+    //                 .getBody();
+
+    //         Date expiration = claims.getExpiration();
+    //         return expiration.after(new Date());
+    //     } catch (Exception e) {
+    //         throw new IllegalArgumentException(MessageCode.TOKEN_EXPIRED_OR_INVALID.getMessage());
+    //     }
+    // }
+
+    public boolean validateToken(String accessToken) {
         try {
+            if (blacklistedTokenService.isTokenBlacklisted(accessToken)) {
+                throw new IllegalArgumentException(MessageCode.TOKEN_EXPIRED_OR_INVALID.getMessage());
+            }
+
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey)
                     .build()
-                    .parseClaimsJws(token)
+                    .parseClaimsJws(accessToken)
                     .getBody();
 
             Date expiration = claims.getExpiration();
@@ -63,12 +86,12 @@ public class TokenService {
         }
     }
 
-    public String getEmailFromToken(String token) {
+    public String getEmailFromToken(String accessToken) {
         try {
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey)
                     .build()
-                    .parseClaimsJws(token)
+                    .parseClaimsJws(accessToken)
                     .getBody();
             return claims.getSubject();
         } catch (Exception e) {

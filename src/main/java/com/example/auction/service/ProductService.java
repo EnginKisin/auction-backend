@@ -1,14 +1,19 @@
 package com.example.auction.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.example.auction.common.exception.FileProcessingException;
 import com.example.auction.common.exception.NotFoundException;
 import com.example.auction.common.message.MessageCode;
 import com.example.auction.model.Product;
+import com.example.auction.model.ProductImage;
 import com.example.auction.model.User;
+import com.example.auction.repository.ProductImageRepository;
 import com.example.auction.repository.ProductRepository;
 
 @Service
@@ -16,6 +21,9 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductImageRepository productImageRepository;
 
     public List<Product> getProductsByOwner(User owner) {
         return productRepository.findByOwner(owner);
@@ -60,5 +68,34 @@ public class ProductService {
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
+    }
+
+
+    //ProductImage process
+    public String addImagesToProduct(Long id, MultipartFile[] files) {
+        Product product = getProductById(id);
+
+        for (MultipartFile file : files) {
+            try {
+                ProductImage image = new ProductImage();
+                image.setProduct(product);
+                image.setContentType(file.getContentType());
+                image.setData(file.getBytes());
+                productImageRepository.save(image);
+            } catch (IOException e) {
+                throw new FileProcessingException(MessageCode.PRODUCT_FILE_PROCESSING_ERROR.getMessage());
+            }
+        }
+
+        return MessageCode.PRODUCT_FILE_PROCESSING_SUCCESS.getMessage();
+    }
+
+
+    public String deleteImageFromProduct(Long id, Long imageId, String email) {
+        ProductImage image = productImageRepository.findById(imageId)
+    .orElseThrow(() -> new RuntimeException("Görsel bulunamadı"));
+        productImageRepository.delete(image);
+
+        return MessageCode.PRODUCT_IMAGE_DELETED.getMessage();
     }
 }

@@ -4,9 +4,11 @@ public enum MessageCode {
     // Kullanıcı,token,login,register Mesajları
     USER_NOT_FOUND("Bu e-posta adresine sahip bir kullanıcı bulunamadı."),
     USER_REGISTRATION_SUCCESS("Kullanıcı başarıyla kaydedildi."),
+    USER_LOGOUT_SUCCESS("Çıkış başarılı."),
 
     INVALID_TOKEN("Geçersiz token."),
     VALID_TOKEN("Token geçerli."),
+    ACCESS_TOKEN_REFRESHED("Token yenilendi."),
     TOKEN_SUCCESS("Token başarıyla alındı."),
     TOKEN_EXPIRED_OR_INVALID("Token geçersiz veya süresi dolmuş."),
     EMAIL_NOT_FOUND_IN_TOKEN("Token'dan e-posta alınamadı."),
@@ -40,6 +42,9 @@ public enum MessageCode {
     PRODUCT_DELETE_UNAUTHORIZED("Bu ürünü silme yetkiniz yok."),
     PRODUCT_UPDATED("Ürün başarıyla düzenlendi."),
     PRODUCT_UPDATE_UNAUTHORIZED("Bu ürünü düzenleme yetkiniz yok."),
+    PRODUCT_FILE_PROCESSING_SUCCESS("Ürün görselleri başarıyla işlendi."),
+    PRODUCT_FILE_PROCESSING_ERROR("Ürün görselleri işlenirken bir hata oluştu."),
+    PRODUCT_IMAGE_DELETED("Ürün görseli silindi."),
     
     // Süre Tipi Mesajları
     DURATION_TYPE_NOT_FOUND("Süre Tipi bulunamadı!");
