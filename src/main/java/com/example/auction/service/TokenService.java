@@ -52,31 +52,21 @@ public class TokenService {
                 .compact();
     }
 
-    // public boolean validateToken(String accessToken) {
-    //     try {
-    //         Claims claims = Jwts.parserBuilder()
-    //                 .setSigningKey(secretKey)
-    //                 .build()
-    //                 .parseClaimsJws(accessToken)
-    //                 .getBody();
-
-    //         Date expiration = claims.getExpiration();
-    //         return expiration.after(new Date());
-    //     } catch (Exception e) {
-    //         throw new IllegalArgumentException(MessageCode.TOKEN_EXPIRED_OR_INVALID.getMessage());
-    //     }
-    // }
-
-    public boolean validateToken(String accessToken) {
+    public boolean validateToken(String token) {
         try {
-            if (blacklistedTokenService.isTokenBlacklisted(accessToken)) {
+            if (token == null || !token.startsWith("Bearer ")) {
+                return false;
+            }
+
+            if (blacklistedTokenService.isTokenBlacklisted(token)) {
                 throw new IllegalArgumentException(MessageCode.TOKEN_EXPIRED_OR_INVALID.getMessage());
             }
 
+            String jwtToken = token.substring(7);
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey)
                     .build()
-                    .parseClaimsJws(accessToken)
+                    .parseClaimsJws(jwtToken)
                     .getBody();
 
             Date expiration = claims.getExpiration();
@@ -86,12 +76,13 @@ public class TokenService {
         }
     }
 
-    public String getEmailFromToken(String accessToken) {
+    public String getEmailFromToken(String token) {
         try {
+            String jwtToken = token.substring(7);
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey)
                     .build()
-                    .parseClaimsJws(accessToken)
+                    .parseClaimsJws(jwtToken)
                     .getBody();
             return claims.getSubject();
         } catch (Exception e) {

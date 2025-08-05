@@ -49,8 +49,7 @@ public class AuctionController {
     
     @GetMapping("/active")
     public ResponseEntity<?> listAllActiveAuctions(@RequestHeader("Authorization") String token) {
-        String email = getEmailFromToken(token);
-        if (email == null) {
+        if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
@@ -61,12 +60,11 @@ public class AuctionController {
 
     @GetMapping("/my")
     public ResponseEntity<?> listAuctionsByOwner(@RequestHeader("Authorization") String token) {
-        String email = getEmailFromToken(token);
-        if (email == null) {
+        if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
-        User owner = userService.findUserByEmail(email);
+        User owner = userService.findUserByEmail(tokenService.getEmailFromToken(token));
         List<Auction> auctions = auctionService.getAuctionsByOwner(owner);
         List<AuctionDTO> auctionDTOs = auctions.stream().map(this::convertToDTO).toList();
         return ResponseHandler.success(auctionDTOs, null, HttpStatus.OK);
@@ -75,8 +73,7 @@ public class AuctionController {
     @PostMapping
     public ResponseEntity<?> createAuction(@RequestBody Map<String, Object> requestBody,
             @RequestHeader("Authorization") String token) {
-        String email = getEmailFromToken(token);
-        if (email == null) {
+        if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
@@ -88,7 +85,7 @@ public class AuctionController {
         auction.setStartingPrice(Double.valueOf(requestBody.get("startingPrice").toString()));
         Long durationTypeId = Long.valueOf(requestBody.get("durationTypeId").toString());
 
-        User owner = userService.findUserByEmail(email);
+        User owner = userService.findUserByEmail(tokenService.getEmailFromToken(token));
         auction.setOwner(owner);
 
         String resultMessage = auctionService.createAuction(auction, durationTypeId);
@@ -97,8 +94,7 @@ public class AuctionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getAuctionDetails(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        String email = getEmailFromToken(token);
-        if (email == null) {
+        if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
@@ -111,12 +107,11 @@ public class AuctionController {
     public ResponseEntity<?> placeBid(@PathVariable Long id, @RequestBody Bid bid,
             @RequestHeader("Authorization") String token) {
 
-        String email = getEmailFromToken(token);
-        if (email == null) {
+        if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
-        User bidder = userService.findUserByEmail(email);
+        User bidder = userService.findUserByEmail(tokenService.getEmailFromToken(token));
         bid.setBidder(bidder);
 
         String resultMessage = bidService.placeBid(id, bid);
@@ -126,8 +121,7 @@ public class AuctionController {
     // @GetMapping("/{id}/bids")
     // public ResponseEntity<?> listBids(@PathVariable Long id,
     // @RequestHeader("Authorization") String token) {
-    // String email = getEmailFromToken(token);
-    // if (email == null) {
+    // if (!tokenService.validateToken(token)) {
     // return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
     // }
 
@@ -139,25 +133,12 @@ public class AuctionController {
 
     @PutMapping("/{id}/close")
     public ResponseEntity<?> closeAuction(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        String email = getEmailFromToken(token);
-        if (email == null) {
+        if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         String resultMessage = auctionService.closeAuction(id);
         return ResponseHandler.success(null, resultMessage, HttpStatus.NO_CONTENT);
-    }
-
-    private String getEmailFromToken(String token) {
-        if (token == null || !token.startsWith("Bearer ")) {
-            return null;
-        }
-
-        String jwtToken = token.substring(7);
-        if (tokenService.validateToken(jwtToken)) {
-            return tokenService.getEmailFromToken(jwtToken);
-        }
-        return null;
     }
 
     private AuctionDTO convertToDTO(Auction auction) {

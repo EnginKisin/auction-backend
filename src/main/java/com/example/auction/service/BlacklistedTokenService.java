@@ -13,12 +13,14 @@ public class BlacklistedTokenService {
     private BlacklistedTokenRepository blacklistedTokenRepository;
 
     public BlacklistedToken blacklistToken(String token) {
+        String jwtToken = token.substring(7);
         BlacklistedToken blacklistedToken = new BlacklistedToken();
-        blacklistedToken.setToken(token);
+        blacklistedToken.setToken(jwtToken);
         return blacklistedTokenRepository.save(blacklistedToken);
     }
 
     public boolean isTokenBlacklisted(String token) {
-        return blacklistedTokenRepository.existsByToken(token);
+        String jwtToken = token.substring(7);
+        return blacklistedTokenRepository.existsByToken(jwtToken);
     }
 }

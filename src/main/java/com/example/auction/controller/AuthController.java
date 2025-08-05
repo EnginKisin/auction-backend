@@ -35,13 +35,6 @@ public class AuthController {
         this.blacklistedTokenService = blacklistedTokenService;
     }
 
-    // @PostMapping("/login")
-    // public ResponseEntity<?> loginUser(@RequestBody User user) {
-    //     User loggedInUser = userService.validateUser(user.getEmail(), user.getPassword());
-    //     String token = tokenService.generateToken(loggedInUser.getEmail());
-    //     return ResponseHandler.success(token, MessageCode.TOKEN_SUCCESS.getMessage(), HttpStatus.OK);
-    // }
-
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User user) {
         User loggedInUser = userService.validateUser(user.getEmail(), user.getPassword());
@@ -76,18 +69,14 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
-        if (token != null && token.startsWith("Bearer ")) {
-            String jwtToken = token.substring(7);
-
-            try {
-                if (tokenService.validateToken(jwtToken)) {
-                    blacklistedTokenService.blacklistToken(jwtToken);
-                    String email = tokenService.getEmailFromToken(jwtToken);
-                    refreshTokenService.deleteByUserEmail(email);
-                }
-            } catch (Exception e) {
-            //
+        try {
+            if (tokenService.validateToken(token)) {
+                blacklistedTokenService.blacklistToken(token);
+                String email = tokenService.getEmailFromToken(token);
+                refreshTokenService.deleteByUserEmail(email);
             }
+        } catch (Exception e) {
+        //
         }
 
         return ResponseHandler.success(null, MessageCode.USER_LOGOUT_SUCCESS.getMessage(), HttpStatus.OK);

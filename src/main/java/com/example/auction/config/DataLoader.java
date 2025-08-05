@@ -39,6 +39,26 @@ public class DataLoader  {
         }
     }
 
+    // private void createUser() {
+    //     String email = "test134gh@gmail.com";
+    //     String password = "test134gh";
+    //     String stripe_customer_id = "cus_RF5UCSbXHg66sI";
+
+    //     User user = new User();
+    //     user.setEmail(email);
+    //     String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+    //     user.setPassword(hashedPassword);
+    //     user.setStripeCustomerId(stripe_customer_id);
+    //     if (user.getRoles() == null || user.getRoles().isEmpty()) {
+    //         Role defaultRole = roleRepository.findByName("user");
+    //         if (defaultRole != null) {
+    //             user.setRoles(Set.of(defaultRole));
+    //         }
+    //     }
+    //     user.setCreatedAt(LocalDateTime.now());
+    //     userRepository.save(user);
+    // }
+
     private void createDurationTypes() {
         if (durationTypeRepository.count() == 0) {
             DurationType shortDuration = new DurationType("Short", 30);  // 30 dakika

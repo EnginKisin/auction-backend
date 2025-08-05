@@ -35,12 +35,11 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<?> listProductsByOwner(@RequestHeader("Authorization") String token) {
-        String email = getEmailFromToken(token);
-        if (email == null) {
+        if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
-        User owner = userService.findUserByEmail(email);
+        User owner = userService.findUserByEmail(tokenService.getEmailFromToken(token));
         List<Product> products = productService.getProductsByOwner(owner);
         List<ProductDTO> productDTOs = products.stream().map(this::convertToDTO).toList();
         return ResponseHandler.success(productDTOs, null, HttpStatus.OK);
@@ -48,12 +47,11 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody Product product, @RequestHeader("Authorization") String token) {
-        String email = getEmailFromToken(token);
-        if (email == null) {
+        if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
-        User owner = userService.findUserByEmail(email);
+        User owner = userService.findUserByEmail(tokenService.getEmailFromToken(token));
         product.setOwner(owner);
 
         String resultMessage = productService.saveProduct(product);
@@ -62,23 +60,21 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product product, @RequestHeader("Authorization") String token) {
-        String email = getEmailFromToken(token);
-        if (email == null) {
+        if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
-        String resultMessage = productService.updateProduct(id, product, email);
+        String resultMessage = productService.updateProduct(id, product, tokenService.getEmailFromToken(token));
         return ResponseHandler.success(null, resultMessage, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        String email = getEmailFromToken(token);
-        if (email == null) {
+        if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
-        String resultMessage = productService.deleteProduct(id, email);
+        String resultMessage = productService.deleteProduct(id, tokenService.getEmailFromToken(token));
         return ResponseHandler.success(null, resultMessage, HttpStatus.NO_CONTENT);
     }
 
@@ -90,8 +86,7 @@ public class ProductController {
             @RequestHeader("Authorization") String token,
             @RequestParam("images") MultipartFile[] files) {
 
-        String email = getEmailFromToken(token);
-        if (email == null) {
+        if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
@@ -105,26 +100,12 @@ public class ProductController {
             @PathVariable Long imageId,
             @RequestHeader("Authorization") String token) {
 
-        String email = getEmailFromToken(token);
-        if (email == null) {
+        if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
-        String resultMessage = productService.deleteImageFromProduct(id, imageId, email);
+        String resultMessage = productService.deleteImageFromProduct(id, imageId, tokenService.getEmailFromToken(token));
         return ResponseHandler.success(null, resultMessage, HttpStatus.NO_CONTENT);
-    }
-
-
-    private String getEmailFromToken(String token) {
-        if (token == null || !token.startsWith("Bearer ")) {
-            return null;
-        }
-
-        String jwtToken = token.substring(7);
-        if (tokenService.validateToken(jwtToken)) {
-            return tokenService.getEmailFromToken(jwtToken);
-        }
-        return null;
     }
 
     private ProductDTO convertToDTO(Product product) {
