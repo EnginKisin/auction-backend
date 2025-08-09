@@ -1,5 +1,6 @@
 package com.example.auction.controller;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.auction.common.message.MessageCode;
 import com.example.auction.common.response.ResponseHandler;
 import com.example.auction.dto.AuctionDTO;
+import com.example.auction.dto.ProductDTO;
+import com.example.auction.dto.ProductImageDTO;
 //import com.example.auction.dto.BidDTO;
 import com.example.auction.model.Auction;
 import com.example.auction.model.Bid;
@@ -45,6 +48,14 @@ public class AuctionController {
         this.userService = userService;
         this.tokenService = tokenService;
         this.productService = productService;
+    }
+
+
+    @GetMapping("/public/active")
+    public ResponseEntity<?> listAllPublicActiveAuctions() {
+        List<Auction> auctions = auctionService.getAllActiveAuctions();
+        List<AuctionDTO> auctionDTOs = auctions.stream().map(this::convertToDTO).toList();
+        return ResponseHandler.success(auctionDTOs, null, HttpStatus.OK);
     }
     
     @GetMapping("/active")
@@ -90,6 +101,13 @@ public class AuctionController {
 
         String resultMessage = auctionService.createAuction(auction, durationTypeId);
         return ResponseHandler.success(null, resultMessage, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/public/{id}")
+    public ResponseEntity<?> getPublicAuctionDetails(@PathVariable Long id) {
+        Auction auction = auctionService.getAuctionById(id);
+        AuctionDTO auctionDTO = convertToDTO(auction);
+        return ResponseHandler.success(auctionDTO, null, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -141,6 +159,28 @@ public class AuctionController {
         return ResponseHandler.success(null, resultMessage, HttpStatus.NO_CONTENT);
     }
 
+    // private AuctionDTO convertToDTO(Auction auction) {
+    //     AuctionDTO auctionDTO = new AuctionDTO();
+    //     auctionDTO.setId(auction.getId());
+    //     auctionDTO.setProductId(auction.getProduct().getId());
+    //     auctionDTO.setOwnerId(auction.getOwner().getId());
+    //     auctionDTO.setStartingPrice(auction.getStartingPrice());
+    //     auctionDTO.setHighestBid(auction.getHighestBid());
+
+    //     if (auction.getHighestBidder() != null) {
+    //         auctionDTO.setHighestBidderId(auction.getHighestBidder().getId());
+    //     } else {
+    //         auctionDTO.setHighestBidderId(null);
+    //     }
+
+    //     auctionDTO.setDurationTypeId(auction.getDurationType().getId());
+    //     auctionDTO.setStartTime(auction.getStartTime());
+    //     auctionDTO.setEndTime(auction.getEndTime());
+    //     auctionDTO.setIsActive(auction.getIsActive());
+    //     return auctionDTO;
+    // }
+
+
     private AuctionDTO convertToDTO(Auction auction) {
         AuctionDTO auctionDTO = new AuctionDTO();
         auctionDTO.setId(auction.getId());
@@ -151,14 +191,33 @@ public class AuctionController {
 
         if (auction.getHighestBidder() != null) {
             auctionDTO.setHighestBidderId(auction.getHighestBidder().getId());
-        } else {
-            auctionDTO.setHighestBidderId(null);
         }
 
         auctionDTO.setDurationTypeId(auction.getDurationType().getId());
         auctionDTO.setStartTime(auction.getStartTime());
         auctionDTO.setEndTime(auction.getEndTime());
         auctionDTO.setIsActive(auction.getIsActive());
+
+        Product product = auction.getProduct();
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(product.getId());
+        productDTO.setName(product.getName());
+        productDTO.setDescription(product.getDescription());
+        productDTO.setPrice(product.getPrice());
+        productDTO.setOwnerId(product.getOwner().getId());
+
+        List<ProductImageDTO> imageDTOs = product.getImages().stream().map(image -> {
+            ProductImageDTO dto = new ProductImageDTO();
+            dto.setId(image.getId());
+            dto.setContentType(image.getContentType());
+            dto.setBase64Data(Base64.getEncoder().encodeToString(image.getData()));
+            return dto;
+        }).toList();
+
+        productDTO.setImages(imageDTOs);
+
+        auctionDTO.setProduct(productDTO);
+
         return auctionDTO;
     }
 

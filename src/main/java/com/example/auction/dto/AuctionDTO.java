@@ -13,6 +13,7 @@ public class AuctionDTO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Boolean isActive;
+    private ProductDTO product;
 
     public Long getId() {
         return id;
@@ -92,5 +93,13 @@ public class AuctionDTO {
 
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public ProductDTO getProduct() {
+        return product;
+    }
+
+    public void setProduct(ProductDTO product) {
+        this.product = product;
     }
 }
