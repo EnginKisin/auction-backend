@@ -90,7 +90,7 @@ public class ProductController {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
-        String resultMessage = productService.addImagesToProduct(id, files);
+        String resultMessage = productService.addImagesToProduct(id, files, tokenService.getEmailFromToken(token));
         return ResponseHandler.success(null, resultMessage, HttpStatus.CREATED);
     }
 

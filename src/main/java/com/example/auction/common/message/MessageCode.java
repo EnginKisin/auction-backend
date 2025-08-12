@@ -38,13 +38,25 @@ public enum MessageCode {
     // Ürün Mesajları
     PRODUCT_SUCCESS("Ürün başarıyla kaydedildi."),
     PRODUCT_NOT_FOUND("Ürün bulunamadı."),
+
     PRODUCT_DELETED("Ürün başarıyla silindi."),
     PRODUCT_DELETE_UNAUTHORIZED("Bu ürünü silme yetkiniz yok."),
+    PRODUCT_DELETE_ACTIVE_AUCTION_ALREADY_EXISTS("Aktif açık artırması olan ürünler silinemez."),
+    PRODUCT_DELETE_AUCTION_ALREADY_EXISTS("Aktif açık artırması olan ürünler silinemez."),
+
     PRODUCT_UPDATED("Ürün başarıyla düzenlendi."),
     PRODUCT_UPDATE_UNAUTHORIZED("Bu ürünü düzenleme yetkiniz yok."),
+    PRODUCT_UPDATE_AUCTION_ALREADY_EXISTS("Açık artırması olan ürünler düzenlenemez."),
+
     PRODUCT_FILE_PROCESSING_SUCCESS("Ürün görselleri başarıyla işlendi."),
     PRODUCT_FILE_PROCESSING_ERROR("Ürün görselleri işlenirken bir hata oluştu."),
+    PRODUCT_IMAGE_NOT_FOUND("Ürün görseli bulunamadı."),
+    PRODUCT_IMAGE_DELETE_UNAUTHORIZED("Bu ürünü silme yetkiniz yok."),
     PRODUCT_IMAGE_DELETED("Ürün görseli silindi."),
+    IMAGE_NOT_BELONG_TO_PRODUCT("Görsel bu ürüne ait değil."),
+    PRODUCT_IMAGE_REQUIRED("En az bir görsel yüklenmelidir."),
+    PRODUCT_UPDATE_IMAGE_AUCTION_ALREADY_EXISTS("Açık artırması olan ürünün görselleri düzenlenemez."),
+    PRODUCT_DELETE_IMAGE_AUCTION_ALREADY_EXISTS("Açık artırması olan ürünün görselleri silinemez."),
     
     // Süre Tipi Mesajları
     DURATION_TYPE_NOT_FOUND("Süre Tipi bulunamadı!");

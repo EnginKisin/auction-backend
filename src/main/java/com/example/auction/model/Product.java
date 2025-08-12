@@ -82,4 +82,12 @@ public class Product {
         this.images = images;
     }
 
+    public Auction getAuction() {
+        return auction;
+    }
+
+    public void setAuction(Auction auction) {
+        this.auction = auction;
+    }
+
 }

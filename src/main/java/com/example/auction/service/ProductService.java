@@ -35,11 +35,14 @@ public class ProductService {
     }
 
     public String updateProduct(Long id, Product product, String email) {
-        Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(MessageCode.PRODUCT_NOT_FOUND.getMessage()));
+        Product existingProduct = getProductById(id);
 
         if (!existingProduct.getOwner().getEmail().equals(email)) {
             throw new IllegalStateException(MessageCode.PRODUCT_UPDATE_UNAUTHORIZED.getMessage());
+        }
+
+        if (existingProduct.getAuction() != null) {
+            throw new IllegalStateException(MessageCode.PRODUCT_UPDATE_AUCTION_ALREADY_EXISTS.getMessage());
         }
 
         existingProduct.setName(product.getName());
@@ -56,13 +59,17 @@ public class ProductService {
     }
 
     public String deleteProduct(Long id, String email) {
-        Product product = getProductById(id);
+        Product existingProduct = getProductById(id);
     
-        if (!product.getOwner().getEmail().equals(email)) {
+        if (!existingProduct.getOwner().getEmail().equals(email)) {
             throw new IllegalStateException(MessageCode.PRODUCT_DELETE_UNAUTHORIZED.getMessage());
         }
+
+        if (existingProduct.getAuction() != null && existingProduct.getAuction().getIsActive()) {
+            throw new IllegalStateException(MessageCode.PRODUCT_DELETE_ACTIVE_AUCTION_ALREADY_EXISTS.getMessage());
+        }
     
-        productRepository.delete(product);
+        productRepository.delete(existingProduct);
         return MessageCode.PRODUCT_DELETED.getMessage();
     }
 
@@ -72,13 +79,25 @@ public class ProductService {
 
 
     //ProductImage process
-    public String addImagesToProduct(Long id, MultipartFile[] files) {
-        Product product = getProductById(id);
+    public String addImagesToProduct(Long id, MultipartFile[] files, String email) {
+        if (files == null || files.length == 0) {
+            throw new IllegalArgumentException(MessageCode.PRODUCT_IMAGE_REQUIRED.getMessage());
+        }
+
+        Product existingProduct = getProductById(id);
+
+        if (!existingProduct.getOwner().getEmail().equals(email)) {
+            throw new IllegalStateException(MessageCode.PRODUCT_UPDATE_UNAUTHORIZED.getMessage());
+        }
+
+        if (existingProduct.getAuction() != null) {
+            throw new IllegalStateException(MessageCode.PRODUCT_UPDATE_IMAGE_AUCTION_ALREADY_EXISTS.getMessage());
+        }
 
         for (MultipartFile file : files) {
             try {
                 ProductImage image = new ProductImage();
-                image.setProduct(product);
+                image.setProduct(existingProduct);
                 image.setContentType(file.getContentType());
                 image.setData(file.getBytes());
                 productImageRepository.save(image);
@@ -92,8 +111,22 @@ public class ProductService {
 
 
     public String deleteImageFromProduct(Long id, Long imageId, String email) {
+        Product existingProduct = getProductById(id);
+    
+        if (!existingProduct.getOwner().getEmail().equals(email)) {
+            throw new IllegalStateException(MessageCode.PRODUCT_DELETE_UNAUTHORIZED.getMessage());
+        }
+
+        if (existingProduct.getAuction() != null) {
+            throw new IllegalStateException(MessageCode.PRODUCT_DELETE_AUCTION_ALREADY_EXISTS.getMessage());
+        }
+
         ProductImage image = productImageRepository.findById(imageId)
-    .orElseThrow(() -> new RuntimeException("Görsel bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException(MessageCode.PRODUCT_IMAGE_NOT_FOUND.getMessage()));
+
+        if (!image.getProduct().getId().equals(existingProduct.getId())) {
+            throw new IllegalStateException(MessageCode.IMAGE_NOT_BELONG_TO_PRODUCT.getMessage());
+        }
         productImageRepository.delete(image);
 
         return MessageCode.PRODUCT_IMAGE_DELETED.getMessage();

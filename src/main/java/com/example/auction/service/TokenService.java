@@ -59,6 +59,7 @@ public class TokenService {
             }
 
             if (blacklistedTokenService.isTokenBlacklisted(token)) {
+                System.out.println("tekenService isTokenBlacklisted kaynaklı hata.");
                 throw new IllegalArgumentException(MessageCode.TOKEN_EXPIRED_OR_INVALID.getMessage());
             }
 
@@ -72,6 +73,7 @@ public class TokenService {
             Date expiration = claims.getExpiration();
             return expiration.after(new Date());
         } catch (Exception e) {
+            System.out.println("tekenService catch exception kaynaklı hata.");
             throw new IllegalArgumentException(MessageCode.TOKEN_EXPIRED_OR_INVALID.getMessage());
         }
     }
