@@ -40,14 +40,46 @@ public class UserService {
         return user;
     }
 
-    public String registerUser(User user, String cardToken) {
+    // public String registerUser(User user, String cardToken) {
+    //     if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+    //         throw new IllegalArgumentException(MessageCode.EMAIL_ALREADY_REGISTERED.getMessage());
+    //     }
+
+    //     try {
+    //         String stripeCustomerId = stripeService.createStripeCustomer(user.getEmail(), cardToken);
+    //         user.setStripeCustomerId(stripeCustomerId);
+    //     } catch (StripeException e) {
+    //         throw new StripeProcessException(MessageCode.STRIPE_ERROR.getMessage() + e);
+    //     }
+
+    //     String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+    //     user.setPassword(hashedPassword);
+
+    //     if (user.getRoles() == null || user.getRoles().isEmpty()) {
+    //         Role defaultRole = roleRepository.findByName("user");
+    //         if (defaultRole != null) {
+    //             user.setRoles(Set.of(defaultRole));
+    //         }
+    //     }
+
+    //     user.setCreatedAt(LocalDateTime.now());
+
+    //     userRepository.save(user);
+    //     return MessageCode.USER_REGISTRATION_SUCCESS.getMessage();
+    // }
+
+
+    public String registerUser(User user, String paymentMethodId) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new IllegalArgumentException(MessageCode.EMAIL_ALREADY_REGISTERED.getMessage());
         }
 
         try {
-            String stripeCustomerId = stripeService.createStripeCustomer(user.getEmail(), cardToken);
+            String stripeCustomerId = stripeService.createStripeCustomer(user.getEmail());
+            stripeService.attachPaymentMethodToCustomer(stripeCustomerId, paymentMethodId);
+
             user.setStripeCustomerId(stripeCustomerId);
+            user.setStripePaymentMethodId(paymentMethodId);
         } catch (StripeException e) {
             throw new StripeProcessException(MessageCode.STRIPE_ERROR.getMessage() + e);
         }
@@ -63,7 +95,6 @@ public class UserService {
         }
 
         user.setCreatedAt(LocalDateTime.now());
-
         userRepository.save(user);
         return MessageCode.USER_REGISTRATION_SUCCESS.getMessage();
     }

@@ -43,9 +43,15 @@ public class AuthController {
         return ResponseHandler.success(Map.of("accessToken", accessToken, "refreshToken", refreshToken),  MessageCode.TOKEN_SUCCESS.getMessage(), HttpStatus.OK);
     }
 
+    // @PostMapping("/register")
+    // public ResponseEntity<?> registerUser(@RequestBody User user, @RequestParam String cardToken) {
+    //     userService.registerUser(user, cardToken);
+    //     return ResponseHandler.success(null, MessageCode.USER_REGISTRATION_SUCCESS.getMessage(), HttpStatus.OK);
+    // }
+
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user, @RequestParam String cardToken) {
-        userService.registerUser(user, cardToken);
+    public ResponseEntity<?> registerUser(@RequestBody User user, @RequestParam String paymentMethodId) {
+        userService.registerUser(user, paymentMethodId);
         return ResponseHandler.success(null, MessageCode.USER_REGISTRATION_SUCCESS.getMessage(), HttpStatus.OK);
     }
 

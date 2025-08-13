@@ -22,6 +22,9 @@ public class User {
     @Column(name = "stripe_customer_id", unique = true)
     private String stripeCustomerId;
 
+    @Column(name = "stripe_payment_method_id")
+    private String stripePaymentMethodId;
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
         name = "user_roles",
@@ -71,6 +74,14 @@ public class User {
         this.stripeCustomerId = stripeCustomerId;
     }
 
+    public String getStripePaymentMethodId() {
+        return stripePaymentMethodId;
+    }
+
+    public void setStripePaymentMethodId(String stripePaymentMethodId) {
+        this.stripePaymentMethodId = stripePaymentMethodId;
+    }
+
     public Set<Role> getRoles() {
         return roles;
     }
@@ -95,6 +106,3 @@ public class User {
         this.products = products;
     }
 }
-
-
-//StrElli135!

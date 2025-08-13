@@ -15,6 +15,7 @@ import com.example.auction.model.Auction;
 import com.example.auction.model.DurationType;
 import com.example.auction.model.User;
 import com.example.auction.repository.AuctionRepository;
+import com.stripe.exception.StripeException;
 
 @Service
 public class AuctionService {
@@ -24,6 +25,23 @@ public class AuctionService {
 
     @Autowired
     private DurationTypeService durationTypeService;
+
+    @Autowired
+    private StripeService stripeService;
+
+    // @Scheduled(fixedRate = 60000)
+    // @Transactional
+    // public void closeExpiredAuctions() {
+    //     List<Auction> activeAuctions = auctionRepository.findByIsActive(true);
+    //     LocalDateTime now = LocalDateTime.now();
+
+    //     for (Auction auction : activeAuctions) {
+    //         if (now.isAfter(auction.getEndTime())) {
+    //             auction.setIsActive(false);
+    //             auctionRepository.save(auction);
+    //         }
+    //     }
+    // }
 
     @Scheduled(fixedRate = 60000)
     @Transactional
@@ -35,6 +53,19 @@ public class AuctionService {
             if (now.isAfter(auction.getEndTime())) {
                 auction.setIsActive(false);
                 auctionRepository.save(auction);
+
+                if (auction.getHighestBidder() != null && auction.getHighestBid() != null) {
+                    try {
+                        stripeService.chargeCustomerWithPaymentIntent(
+                            auction.getHighestBidder().getStripeCustomerId(),
+                            auction.getHighestBidder().getStripePaymentMethodId(),
+                            auction.getHighestBid(),
+                            "usd"
+                        );
+                    } catch (StripeException e) {
+                        System.err.println("Stripe ödeme hatası: " + e.getMessage());
+                    }
+                }
             }
         }
     }
