@@ -34,6 +34,7 @@ public enum MessageCode {
     BID_NOT_FOUND("Açık artırmada teklif bulunamadı."),
     HIGHEST_BID_NOT_FOUND("Açık artırmada en yüksek teklif bulunamadı."),
     BIDS_LISTED("Teklifler listelendi."),
+    BID_OWN_AUCTION_NOT_ALLOWED("Kendi oluşturduğunuz açık artırmaya teklif veremezsiniz."),
 
     // Ürün Mesajları
     PRODUCT_SUCCESS("Ürün başarıyla kaydedildi."),

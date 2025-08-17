@@ -26,6 +26,9 @@ public class BidService {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new NotFoundException(MessageCode.AUCTION_NOT_FOUND.getMessage()));
 
+        if (auction.getOwner().getId() == bid.getBidder().getId()) {
+            throw new IllegalArgumentException(MessageCode.BID_OWN_AUCTION_NOT_ALLOWED.getMessage());
+        }
 
         if (!auction.getIsActive() || LocalDateTime.now().isAfter(auction.getEndTime())) {
             throw new IllegalArgumentException(MessageCode.AUCTION_INACTIVE.getMessage());
