@@ -2,14 +2,32 @@ package com.example.auction.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 public class AuctionDTO {
+
     private Long id;
+
+    @NotNull(message = "Ürün ID boş olamaz")
+    @JsonProperty("product_id")
     private Long productId;
     private Long ownerId;
+
+    @NotNull(message = "Başlangıç fiyatı boş olamaz")
+    @Positive(message = "Başlangıç fiyatı 0’dan büyük olmalıdır")
+    @Digits(integer = 8, fraction = 2, message = "Başlangıç fiyatı formatı hatalı (max 8 hane ve 2 ondalık olmalı)")
     private Double startingPrice;
+
     private Double highestBid;
     private Long highestBidderId;
+
+    @NotNull(message = "Süre tipi ID boş olamaz")
     private Long durationTypeId;
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Boolean isActive;

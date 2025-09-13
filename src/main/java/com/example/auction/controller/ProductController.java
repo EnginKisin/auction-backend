@@ -9,6 +9,9 @@ import com.example.auction.model.User;
 import com.example.auction.service.ProductService;
 import com.example.auction.service.TokenService;
 import com.example.auction.service.UserService;
+import com.example.auction.validations.ProductImageValidator;
+
+import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +29,13 @@ public class ProductController {
     private final ProductService productService;
     private final UserService userService;
     private final TokenService tokenService;
+    private final ProductImageValidator productImageValidator;
 
-    public ProductController(ProductService productService, UserService userService, TokenService tokenService) {
+    public ProductController(ProductService productService, UserService userService, TokenService tokenService, ProductImageValidator productImageValidator) {
         this.productService = productService;
         this.userService = userService;
         this.tokenService = tokenService;
+        this.productImageValidator = productImageValidator;
     }
 
     @GetMapping
@@ -46,12 +51,17 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody Product product, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDTO productDTO, @RequestHeader("Authorization") String token) {
         if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         User owner = userService.findUserByEmail(tokenService.getEmailFromToken(token));
+
+        Product product = new Product();
+        product.setName(productDTO.getName());
+        product.setDescription(productDTO.getDescription());
+        product.setPrice(productDTO.getPrice());
         product.setOwner(owner);
 
         String resultMessage = productService.saveProduct(product);
@@ -59,10 +69,15 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product product, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDTO productDTO, @RequestHeader("Authorization") String token) {
         if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
+
+        Product product = new Product();
+        product.setName(productDTO.getName());
+        product.setDescription(productDTO.getDescription());
+        product.setPrice(productDTO.getPrice());
 
         String resultMessage = productService.updateProduct(id, product, tokenService.getEmailFromToken(token));
         return ResponseHandler.success(null, resultMessage, HttpStatus.OK);
@@ -80,6 +95,20 @@ public class ProductController {
 
 
     //ProductImage process
+    // @PostMapping("/{id}/images")
+    // public ResponseEntity<?> uploadImages(
+    //         @PathVariable Long id,
+    //         @RequestHeader("Authorization") String token,
+    //         @RequestParam("images") MultipartFile[] files) {
+
+    //     if (!tokenService.validateToken(token)) {
+    //         return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
+    //     }
+
+    //     String resultMessage = productService.addImagesToProduct(id, files, tokenService.getEmailFromToken(token));
+    //     return ResponseHandler.success(null, resultMessage, HttpStatus.CREATED);
+    // }
+
     @PostMapping("/{id}/images")
     public ResponseEntity<?> uploadImages(
             @PathVariable Long id,
@@ -88,6 +117,12 @@ public class ProductController {
 
         if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+
+        try {
+            productImageValidator.validate(files);
+        } catch (IllegalArgumentException e) {
+            return ResponseHandler.error(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
         String resultMessage = productService.addImagesToProduct(id, files, tokenService.getEmailFromToken(token));

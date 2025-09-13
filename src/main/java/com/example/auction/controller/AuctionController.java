@@ -1,5 +1,6 @@
 package com.example.auction.controller;
 
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.auction.common.message.MessageCode;
 import com.example.auction.common.response.ResponseHandler;
 import com.example.auction.dto.AuctionDTO;
+import com.example.auction.dto.BidDTO;
 import com.example.auction.dto.ProductDTO;
 import com.example.auction.dto.ProductImageDTO;
 //import com.example.auction.dto.BidDTO;
@@ -30,6 +32,8 @@ import com.example.auction.service.BidService;
 import com.example.auction.service.ProductService;
 import com.example.auction.service.TokenService;
 import com.example.auction.service.UserService;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/api/auctions")
@@ -82,24 +86,24 @@ public class AuctionController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createAuction(@RequestBody Map<String, Object> requestBody,
+    public ResponseEntity<?> createAuction(
+            @Valid @RequestBody AuctionDTO auctionDTO,
             @RequestHeader("Authorization") String token) {
+
         if (!tokenService.validateToken(token)) {
             return ResponseHandler.error(MessageCode.INVALID_TOKEN.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
-        Long productId = Long.valueOf(requestBody.get("product_id").toString());
-        Product product = productService.getProductById(productId);
+        Product product = productService.getProductById(auctionDTO.getProductId());
 
         Auction auction = new Auction();
         auction.setProduct(product);
-        auction.setStartingPrice(Double.valueOf(requestBody.get("startingPrice").toString()));
-        Long durationTypeId = Long.valueOf(requestBody.get("durationTypeId").toString());
+        auction.setStartingPrice(auctionDTO.getStartingPrice());
 
         User owner = userService.findUserByEmail(tokenService.getEmailFromToken(token));
         auction.setOwner(owner);
 
-        String resultMessage = auctionService.createAuction(auction, durationTypeId);
+        String resultMessage = auctionService.createAuction(auction, auctionDTO.getDurationTypeId());
         return ResponseHandler.success(null, resultMessage, HttpStatus.CREATED);
     }
 
@@ -122,7 +126,9 @@ public class AuctionController {
     }
 
     @PostMapping("/{id}/bids")
-    public ResponseEntity<?> placeBid(@PathVariable Long id, @RequestBody Bid bid,
+    public ResponseEntity<?> placeBid(
+            @PathVariable Long id,
+            @Valid @RequestBody BidDTO bidDTO,
             @RequestHeader("Authorization") String token) {
 
         if (!tokenService.validateToken(token)) {
@@ -130,6 +136,9 @@ public class AuctionController {
         }
 
         User bidder = userService.findUserByEmail(tokenService.getEmailFromToken(token));
+
+        Bid bid = new Bid();
+        bid.setAmount(bidDTO.getAmount());
         bid.setBidder(bidder);
 
         String resultMessage = bidService.placeBid(id, bid);

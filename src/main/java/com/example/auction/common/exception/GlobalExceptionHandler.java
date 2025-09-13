@@ -1,7 +1,11 @@
 package com.example.auction.common.exception;
 
+import java.util.List;
+
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -29,6 +33,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(StripeProcessException.class)
     public ResponseEntity<ResponseWrapper<Object>> handleStripeWrapped(StripeProcessException ex) {
         return ResponseHandler.error(ex.getMessage(), HttpStatus.BAD_GATEWAY);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ResponseWrapper<Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
+        List<String> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .toList();
+
+        String errorMessage = String.join(", ", errors);
+
+        return ResponseHandler.error(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

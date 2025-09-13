@@ -2,11 +2,20 @@ package com.example.auction.dto;
 
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 public class BidDTO {
     private Long id;
     private Long auctionId;
     private Long bidderId;
+
+    @NotNull(message = "Teklif miktarı boş olamaz")
+    @Positive(message = "Teklif miktarı 0’dan büyük olmalıdır")
+    @Digits(integer = 8, fraction = 2, message = "Teklif miktarı hatalı formatta (max 8 hane ve 2 ondalık olmalı)")
     private Double amount;
+
     private LocalDateTime bidTime;
 
     public Long getId() {
