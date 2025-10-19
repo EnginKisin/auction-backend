@@ -12,21 +12,6 @@ import com.stripe.model.PaymentMethod;
 
 @Service
 public class StripeService {
-    // @Value("${stripe.api.key}")
-    // private String stripeApiKey;
-
-    // public String createStripeCustomer(String email, String cardToken) throws StripeException {
-    //     com.stripe.Stripe.apiKey = stripeApiKey;
-
-    //     Customer customer = Customer.create(
-    //             Map.of(
-    //                     "email", email,
-    //                     "source", cardToken
-    //             )
-    //     );
-    //     return customer.getId();
-    // }
-
     @Value("${stripe.api.key}")
     private String stripeApiKey;
 
@@ -42,7 +27,6 @@ public class StripeService {
         PaymentMethod paymentMethod = PaymentMethod.retrieve(paymentMethodId);
         paymentMethod.attach(Map.of("customer", customerId));
 
-        // Mevcut müşteriyi çekip güncelle
         Customer customer = Customer.retrieve(customerId);
         customer.update(Map.of(
             "invoice_settings", Map.of("default_payment_method", paymentMethodId)
@@ -57,7 +41,7 @@ public class StripeService {
             "currency", currency,
             "customer", customerId,
             "payment_method", paymentMethodId,
-            "off_session", true, // müşteri çevrimdışı
+            "off_session", true,
             "confirm", true
         ));
 

@@ -53,22 +53,4 @@ public class BidService {
         return MessageCode.BID_SUCCESS.getMessage();
     }
 
-    // public Bid getHighestBid(Long auctionId) {
-    // List<Bid> bids = bidRepository.findByAuctionId(auctionId);
-    // if (bids == null || bids.isEmpty()) {
-    // throw new IllegalArgumentException(MessageCode.BID_NOT_FOUND.getMessage());
-    // }
-    // return bids.stream()
-    // .max((b1, b2) -> Double.compare(b1.getAmount(), b2.getAmount()))
-    // .orElseThrow(() -> new
-    // NotFoundException(MessageCode.HIGHEST_BID_NOT_FOUND.getMessage()));
-    // }
-
-    // public List<Bid> getBidsForAuction(Long auctionId) {
-    // if (auctionId == null || auctionId <= 0) {
-    // throw new NotFoundException(MessageCode.INVALID_AUCTION_ID.getMessage());
-    // }
-    // return bidRepository.findByAuctionId(auctionId);
-    // }
-
 }

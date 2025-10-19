@@ -29,20 +29,6 @@ public class AuctionService {
     @Autowired
     private StripeService stripeService;
 
-    // @Scheduled(fixedRate = 60000)
-    // @Transactional
-    // public void closeExpiredAuctions() {
-    //     List<Auction> activeAuctions = auctionRepository.findByIsActive(true);
-    //     LocalDateTime now = LocalDateTime.now();
-
-    //     for (Auction auction : activeAuctions) {
-    //         if (now.isAfter(auction.getEndTime())) {
-    //             auction.setIsActive(false);
-    //             auctionRepository.save(auction);
-    //         }
-    //     }
-    // }
-
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void closeExpiredAuctions() {
@@ -87,10 +73,6 @@ public class AuctionService {
         auctionRepository.save(auction);
         return MessageCode.AUCTION_CREATED_SUCCESS.getMessage();
     }
-
-    // public List<Auction> getAllAuctions() {
-    //     return auctionRepository.findAll();
-    // }
 
     public List<Auction> getAllActiveAuctions() {
         return auctionRepository.findByIsActive(true);
