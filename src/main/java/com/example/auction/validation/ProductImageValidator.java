@@ -1,4 +1,4 @@
-package com.example.auction.validations;
+package com.example.auction.validation;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;

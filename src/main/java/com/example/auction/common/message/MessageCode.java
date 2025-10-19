@@ -6,7 +6,7 @@ public enum MessageCode {
     USER_REGISTRATION_SUCCESS("Kullanıcı başarıyla kaydedildi."),
     USER_LOGOUT_SUCCESS("Çıkış başarılı."),
 
-    INVALID_TOKEN("Geçersiz token."),
+    INVALID_TOKEN("Geçersiz veya süresi dolmuş token."),
     VALID_TOKEN("Token geçerli."),
     ACCESS_TOKEN_REFRESHED("Token yenilendi."),
     TOKEN_SUCCESS("Token başarıyla alındı."),

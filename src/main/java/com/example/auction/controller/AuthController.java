@@ -12,14 +12,14 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
@@ -42,12 +42,6 @@ public class AuthController {
         String refreshToken = refreshTokenService.createRefreshToken(loggedInUser.getEmail());
         return ResponseHandler.success(Map.of("accessToken", accessToken, "refreshToken", refreshToken),  MessageCode.TOKEN_SUCCESS.getMessage(), HttpStatus.OK);
     }
-
-    // @PostMapping("/register")
-    // public ResponseEntity<?> registerUser(@RequestBody User user, @RequestParam String cardToken) {
-    //     userService.registerUser(user, cardToken);
-    //     return ResponseHandler.success(null, MessageCode.USER_REGISTRATION_SUCCESS.getMessage(), HttpStatus.OK);
-    // }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user, @RequestParam String paymentMethodId) {
