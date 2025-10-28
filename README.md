@@ -40,7 +40,8 @@ cd auction-backend
 
 ---
 
-### 3️⃣ application.properties Dosyasını Düzenle
+### 3️⃣ application.properties Dosyasını Oluştur ve Düzenle
+Projede `src/main/resources` dizinine bir `application.properties` dosyası oluştur. İçeriğini aşağıdaki gibi doldur:
 ```
 spring.application.name=auction
 spring.datasource.url=jdbc:sqlserver://sqlserver:1433;encrypt=true;trustServerCertificate=true
