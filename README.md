@@ -100,7 +100,7 @@ docker-compose up -d
 
 ---
 
-6️⃣ Frontend Bilgisi
+### 6️⃣ Frontend Bilgisi
 
 Bu proje yalnızca backend (REST API) kısmını içerir.
 Uygulamanın frontend kısmı, ayrı bir GitHub reposunda yer almaktadır.
