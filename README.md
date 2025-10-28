@@ -2,7 +2,7 @@
 
 ## 📝 Proje Hakkında
 **Auction Backend**, açık artırma (auction) mantığıyla çalışan bir **RESTful API** uygulamasıdır.  
-Kullanıcılar kayıt olabilir, ürün ekleyebilir, teklif verebilir ve JWT ile güvenli şekilde API istekleri yapabilirler.  
+Kullanıcılar kayıt olabilir, ürün ekleyebilir, açık arttırma oluşturabilir, teklif verebilir ve JWT ile güvenli şekilde API istekleri yapabilirler.  
 
 ---
 
