@@ -90,3 +90,10 @@ services:
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: YOUR_DB_PASSWORD
 ```
+
+---
+
+### 5️⃣ Docker Compose ile Projeyi Başlat
+```bash
+docker-compose up -d
+```
