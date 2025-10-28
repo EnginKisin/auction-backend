@@ -97,3 +97,17 @@ services:
 ```bash
 docker-compose up -d
 ```
+
+---
+
+6️⃣ Frontend Bilgisi
+
+Bu proje yalnızca backend (REST API) kısmını içerir.
+Uygulamanın frontend kısmı, ayrı bir GitHub reposunda yer almaktadır.
+
+🔗 Frontend Repository:
+👉 https://github.com/EnginKisin/auction-frontend
+
+Frontend uygulaması React + Vite kullanılarak geliştirilmiştir ve bu backend API’si ile entegre çalışır.
+Varsayılan olarak http://localhost:5173 adresinde çalışır.
+Frontend’in nasıl başlatılacağına dair kurulum ve çalıştırma adımları, ilgili frontend reposunun README dosyasında açıklanmıştır.
