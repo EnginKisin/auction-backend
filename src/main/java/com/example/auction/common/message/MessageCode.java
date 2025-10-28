@@ -58,6 +58,11 @@ public enum MessageCode {
     PRODUCT_IMAGE_REQUIRED("En az bir görsel yüklenmelidir."),
     PRODUCT_UPDATE_IMAGE_AUCTION_ALREADY_EXISTS("Açık artırması olan ürünün görselleri düzenlenemez."),
     PRODUCT_DELETE_IMAGE_AUCTION_ALREADY_EXISTS("Açık artırması olan ürünün görselleri silinemez."),
+
+    // Upload Mesajları
+    EMPTY_FILE_NOT_UPLOAD("Boş dosya yüklenemez."),
+    ONLY_IMAGE_FORMAT_UPLOAD("Sadece resim formatları yüklenebilir."),
+    FILE_SIZE_NOT_EXCEED_5MB("Dosya boyutu 5mb'ı geçmemelidir."),
     
     // Süre Tipi Mesajları
     DURATION_TYPE_NOT_FOUND("Süre Tipi bulunamadı!");
