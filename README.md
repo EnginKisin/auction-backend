@@ -2,7 +2,7 @@
 
 ## 📝 Proje Hakkında
 **Auction Backend**, açık artırma (auction) mantığıyla çalışan bir **RESTful API** uygulamasıdır.  
-Kullanıcılar kayıt olabilir, ürün ekleyebilir, teklif verebilir ve JWT ile güvenli şekilde API istekleri yapabilirler.  
+Kullanıcılar kayıt olabilir, ürün ekleyebilir, açık arttırma oluşturabilir, teklif verebilir ve JWT ile güvenli şekilde API istekleri yapabilirler.  
 
 ---
 
@@ -40,7 +40,8 @@ cd auction-backend
 
 ---
 
-### 3️⃣ application.properties Dosyasını Düzenle
+### 3️⃣ application.properties Dosyasını Oluştur ve Düzenle
+Projede `src/main/resources` dizinine bir `application.properties` dosyası oluştur. İçeriğini aşağıdaki gibi doldur:
 ```
 spring.application.name=auction
 spring.datasource.url=jdbc:sqlserver://sqlserver:1433;encrypt=true;trustServerCertificate=true
@@ -96,3 +97,17 @@ services:
 ```bash
 docker-compose up -d
 ```
+
+---
+
+### 6️⃣ Frontend Bilgisi
+
+Bu proje yalnızca backend (REST API) kısmını içerir.
+Uygulamanın frontend kısmı, ayrı bir GitHub reposunda yer almaktadır.
+
+🔗 Frontend Repository:
+👉 https://github.com/EnginKisin/auction-frontend
+
+Frontend uygulaması React + Vite kullanılarak geliştirilmiştir ve bu backend API’si ile entegre çalışır.
+Varsayılan olarak http://localhost:5173 adresinde çalışır.
+Frontend’in nasıl başlatılacağına dair kurulum ve çalıştırma adımları, ilgili frontend reposunun README dosyasında açıklanmıştır.
