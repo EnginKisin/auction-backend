@@ -3,16 +3,10 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=YOUR_DB_PASSWORD
+      ACCEPT_EULA: Y
+      SA_PASSWORD: YOUR_DB_PASSWORD
     ports:
       - "1434:1433"
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YOUR_DB_PASSWORD -Q 'SELECT 1' || exit 0"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 15s
 
   auction-app:
     build: .
@@ -20,9 +14,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      sqlserver:
-        condition: service_healthy
+      - sqlserver
     environment:
-      SPRING_DATASOURCE_URL: jdbc:sqlserver://sqlserver:1433;encrypt=true;trustServerCertificate=true
+      SPRING_DATASOURCE_URL: jdbc:sqlserver://sqlserver:1433;databaseName=auctionDB;encrypt=true;trustServerCertificate=true
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: YOUR_DB_PASSWORD
