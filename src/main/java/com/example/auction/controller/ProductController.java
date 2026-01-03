@@ -1,5 +1,6 @@
 package com.example.auction.controller;
 
+import com.example.auction.common.message.MessageCode;
 import com.example.auction.common.response.ResponseHandler;
 import com.example.auction.dto.ProductDTO;
 import com.example.auction.dto.ProductImageDTO;
@@ -39,17 +40,36 @@ public class ProductController {
         return ResponseHandler.success(productDTOs, null, HttpStatus.OK);
     }
 
+    // @PostMapping
+    // public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDTO productDTO, HttpServletRequest request) {
+    //     User user = (User) request.getAttribute("authenticatedUser");
+    //     Product product = new Product();
+    //     product.setName(productDTO.getName());
+    //     product.setDescription(productDTO.getDescription());
+    //     product.setPrice(productDTO.getPrice());
+    //     product.setOwner(user);
+
+    //     String resultMessage = productService.saveProduct(product);
+    //     return ResponseHandler.success(null, resultMessage, HttpStatus.CREATED);
+    // }
+
     @PostMapping
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDTO productDTO, HttpServletRequest request) {
+
         User user = (User) request.getAttribute("authenticatedUser");
+
         Product product = new Product();
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
         product.setPrice(productDTO.getPrice());
         product.setOwner(user);
 
-        String resultMessage = productService.saveProduct(product);
-        return ResponseHandler.success(null, resultMessage, HttpStatus.CREATED);
+        Product savedProduct = productService.saveProduct(product);
+
+        ProductDTO responseDto = new ProductDTO();
+        responseDto.setId(savedProduct.getId());
+
+        return ResponseHandler.success(responseDto, MessageCode.PRODUCT_SUCCESS.getMessage(), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

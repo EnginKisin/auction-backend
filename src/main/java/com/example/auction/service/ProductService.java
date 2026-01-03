@@ -29,9 +29,13 @@ public class ProductService {
         return productRepository.findByOwner(owner);
     }
 
-    public String saveProduct(Product product) {
-        productRepository.save(product);
-        return MessageCode.PRODUCT_SUCCESS.getMessage();
+    // public String saveProduct(Product product) {
+    //     productRepository.save(product);
+    //     return MessageCode.PRODUCT_SUCCESS.getMessage();
+    // }
+
+    public Product saveProduct(Product product) {
+        return productRepository.save(product);
     }
 
     public String updateProduct(Long id, Product product, String email) {
