@@ -44,7 +44,7 @@ cd auction-backend
 Projede `src/main/resources` dizinine bir `application.properties` dosyası oluştur. İçeriğini aşağıdaki gibi doldur:
 ```
 spring.application.name=auction
-spring.datasource.url=jdbc:sqlserver://sqlserver:1433;encrypt=true;trustServerCertificate=true
+spring.datasource.url=jdbc:sqlserver://sqlserver:1433;databaseName=auctionDB;encrypt=true;trustServerCertificate=true
 spring.datasource.username=sa
 spring.datasource.password=YOUR_DB_PASSWORD
 spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -66,16 +66,10 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=YOUR_DB_PASSWORD
+      ACCEPT_EULA: Y
+      SA_PASSWORD: YOUR_DB_PASSWORD
     ports:
       - "1434:1433"
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YOUR_DB_PASSWORD -Q 'SELECT 1' || exit 0"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 15s
 
   auction-app:
     build: .
@@ -83,25 +77,42 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      sqlserver:
-        condition: service_healthy
+      - sqlserver
     environment:
-      SPRING_DATASOURCE_URL: jdbc:sqlserver://sqlserver:1433;encrypt=true;trustServerCertificate=true
+      SPRING_DATASOURCE_URL: jdbc:sqlserver://sqlserver:1433;databaseName=auctionDB;encrypt=true;trustServerCertificate=true
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: YOUR_DB_PASSWORD
 ```
 
 ---
 
-### 5️⃣ Docker Compose ile Projeyi Başlat
+### 5️⃣ SQL Server Container’ını Başlat ve Veritabanını Manuel Oluştur
 ```bash
-docker-compose up -d
+docker-compose up -d sqlserver
 ```
+SQL Server ayağa kalktıktan sonra, Microsoft SQL Server Management Studio (SSMS) veya herhangi bir SQL istemcisi ile aşağıdaki bilgilerle bağlantı kurun:
+
+Server: localhost,1434
+Username: sa
+Password: YOUR_DB_PASSWORD
+
+Bağlandıktan sonra aşağıdaki SQL komutunu çalıştırarak veritabanını manuel olarak oluşturun:
+```bash
+CREATE DATABASE auctionDB;
+```
+---
+
+### 6️⃣ Auction Backend Container’ını Başlat
+Veritabanı oluşturulduktan sonra backend uygulamasını başlatın:
+```bash
+docker-compose up -d auction-app
+```
+Uygulama başarıyla ayağa kalktıktan sonra API aşağıdaki adreste, frontende için erişilebilir olacaktır:
+👉 http://localhost:8080
 
 ---
 
-### 6️⃣ Frontend Bilgisi
-
+### 7️⃣ Frontend Bilgisi
 Bu proje yalnızca backend (REST API) kısmını içerir.
 Uygulamanın frontend kısmı, ayrı bir GitHub reposunda yer almaktadır.
 
