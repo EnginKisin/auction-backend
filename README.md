@@ -92,9 +92,9 @@ docker-compose up -d sqlserver
 ```
 SQL Server ayağa kalktıktan sonra, Microsoft SQL Server Management Studio (SSMS) veya herhangi bir SQL istemcisi ile aşağıdaki bilgilerle bağlantı kurun:
 
-Server: localhost,1434
-Username: sa
-Password: YOUR_DB_PASSWORD
+- Server: localhost,1434
+- Username: sa
+- Password: YOUR_DB_PASSWORD
 
 Bağlandıktan sonra aşağıdaki SQL komutunu çalıştırarak veritabanını manuel olarak oluşturun:
 ```bash
