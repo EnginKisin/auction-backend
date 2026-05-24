@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.auction.common.exception.NotFoundException;
 import com.example.auction.common.message.MessageCode;
+import com.example.auction.dto.AuctionUpdateDTO;
 import com.example.auction.model.Auction;
 import com.example.auction.model.Bid;
 import com.example.auction.repository.AuctionRepository;
@@ -20,6 +21,9 @@ public class BidService {
 
     @Autowired
     private AuctionRepository auctionRepository;
+
+    @Autowired
+    private AuctionRealtimeService auctionRealtimeService;
 
     @Transactional
     public String placeBid(Long auctionId, Bid bid) {
@@ -50,7 +54,13 @@ public class BidService {
         bidRepository.save(bid);
         auctionRepository.save(auction);
 
+        AuctionUpdateDTO dto = new AuctionUpdateDTO();
+        dto.setId(auction.getId());
+        dto.setHighestBid(auction.getHighestBid());
+        dto.setHighestBidderId(auction.getHighestBidder().getId());
+
+        auctionRealtimeService.broadcastAuctionUpdate(dto);
+
         return MessageCode.BID_SUCCESS.getMessage();
     }
-
 }

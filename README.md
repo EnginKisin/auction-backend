@@ -2,7 +2,7 @@
 
 ## 📝 Proje Hakkında
 **Auction Backend**, açık artırma (auction) mantığıyla çalışan bir **RESTful API** uygulamasıdır.  
-Kullanıcılar kayıt olabilir, ürün ekleyebilir, açık arttırma oluşturabilir, teklif verebilir ve JWT ile güvenli şekilde API istekleri yapabilirler.  
+Kullanıcılar kayıt olabilir, ürün ekleyebilir, açık arttırma oluşturabilir, gerçek zamanlı teklif verebilir ve JWT ile güvenli şekilde API istekleri yapabilirler.  
 
 ---
 
@@ -15,6 +15,7 @@ Kullanıcılar kayıt olabilir, ürün ekleyebilir, açık arttırma oluşturabi
   - Spring Validation  
   - Spring Boot Actuator  
 - **Microsoft SQL Server (mcr.microsoft.com/mssql/server:2022-latest)**
+- **WebSocket (STOMP)** (gerçek zamanlı açık artırma güncellemeleri için)
 - **Stripe API** (ödeme işlemleri için)
 - **BCrypt** (şifreleme)
 - **Docker & Docker Compose**
@@ -107,7 +108,7 @@ Veritabanı oluşturulduktan sonra backend uygulamasını başlatın:
 ```bash
 docker-compose up -d auction-app
 ```
-Uygulama başarıyla ayağa kalktıktan sonra API aşağıdaki adreste, frontende için erişilebilir olacaktır:
+Uygulama başarıyla ayağa kalktıktan sonra API aşağıdaki adresten frontend tarafından erişilebilir olacaktır:
 👉 http://localhost:8080
 
 ---
