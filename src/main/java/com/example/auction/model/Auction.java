@@ -1,6 +1,6 @@
 package com.example.auction.model;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,10 +36,10 @@ public class Auction {
     private DurationType durationType;
 
     @Column(nullable = false)
-    private LocalDateTime startTime;
+    private Instant startTime;
 
     @Column(nullable = false)
-    private LocalDateTime endTime;
+    private Instant endTime;
 
     @Column(nullable = false)
     private Boolean isActive;
@@ -107,19 +107,19 @@ public class Auction {
         return this.durationType = durationType;
     }
 
-    public LocalDateTime getStartTime() {
+    public Instant getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
+    public void setStartTime(Instant startTime) {
         this.startTime = startTime;
     }
 
-    public LocalDateTime getEndTime() {
+    public Instant getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalDateTime endTime) {
+    public void setEndTime(Instant endTime) {
         this.endTime = endTime;
     }
 

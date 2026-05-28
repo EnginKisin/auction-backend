@@ -1,6 +1,6 @@
 package com.example.auction.dto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +16,7 @@ public class BidDTO {
     @Digits(integer = 8, fraction = 2, message = "Teklif miktarı hatalı formatta (max 8 hane ve 2 ondalık olmalı)")
     private Double amount;
 
-    private LocalDateTime bidTime;
+    private Instant bidTime;
 
     public Long getId() {
         return id;
@@ -50,11 +50,11 @@ public class BidDTO {
         this.amount = amount;
     }
 
-    public LocalDateTime getBidTime() {
+    public Instant getBidTime() {
         return bidTime;
     }
 
-    public void setBidTime(LocalDateTime bidTime) {
+    public void setBidTime(Instant bidTime) {
         this.bidTime = bidTime;
     }
 }

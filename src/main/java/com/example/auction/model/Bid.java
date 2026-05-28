@@ -1,7 +1,6 @@
 package com.example.auction.model;
 
-import java.time.LocalDateTime;
-
+import java.time.Instant;
 import jakarta.persistence.*;
 
 @Entity
@@ -23,7 +22,7 @@ public class Bid {
     private Double amount;
 
     @Column(nullable = false)
-    private LocalDateTime bidTime;
+    private Instant bidTime;
 
     public Bid() {
         
@@ -61,11 +60,11 @@ public class Bid {
         this.amount = amount;
     }
 
-    public LocalDateTime getBidTime() {
+    public Instant getBidTime() {
         return bidTime;
     }
 
-    public void setBidTime(LocalDateTime bidTime) {
+    public void setBidTime(Instant bidTime) {
         this.bidTime = bidTime;
     }
 }

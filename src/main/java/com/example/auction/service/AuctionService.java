@@ -1,6 +1,7 @@
 package com.example.auction.service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class AuctionService {
     @Transactional
     public void closeExpiredAuctions() {
         List<Auction> activeAuctions = auctionRepository.findByIsActive(true);
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
 
         for (Auction auction : activeAuctions) {
             if (now.isAfter(auction.getEndTime())) {
@@ -62,12 +63,12 @@ public class AuctionService {
             throw new IllegalStateException(MessageCode.AUCTION_ALREADY_EXISTS.getMessage());
         }
 
-        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).plusMinutes(1);
-        auction.setStartTime(now);
-
+        Instant now = Instant.now().truncatedTo(ChronoUnit.MINUTES).plus(1, ChronoUnit.MINUTES);
         DurationType durationType = durationTypeService.getDurationTypeById(durationTypeId);
+        auction.setStartTime(now);
+        auction.setEndTime(now.plus(Duration.ofMinutes(durationType.getDurationInMinutes())));
+
         auction.setDurationType(durationType);
-        auction.setEndTime(now.plusMinutes(durationType.getDurationInMinutes()));
         auction.setIsActive(true);
 
         auctionRepository.save(auction);

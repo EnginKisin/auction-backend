@@ -1,7 +1,6 @@
 package com.example.auction.dto;
 
-import java.time.LocalDateTime;
-
+import java.time.Instant;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Digits;
@@ -28,8 +27,8 @@ public class AuctionDTO {
     @NotNull(message = "Süre tipi ID boş olamaz")
     private Long durationTypeId;
 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private Instant startTime;
+    private Instant endTime;
     private Boolean isActive;
     private ProductDTO product;
 
@@ -89,19 +88,19 @@ public class AuctionDTO {
         this.durationTypeId = durationTypeId;
     }
 
-    public LocalDateTime getStartTime() {
+    public Instant getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
+    public void setStartTime(Instant startTime) {
         this.startTime = startTime;
     }
 
-    public LocalDateTime getEndTime() {
+    public Instant getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalDateTime endTime) {
+    public void setEndTime(Instant endTime) {
         this.endTime = endTime;
     }
 

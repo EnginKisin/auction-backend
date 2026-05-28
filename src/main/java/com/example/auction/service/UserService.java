@@ -1,6 +1,6 @@
 package com.example.auction.service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -65,7 +65,7 @@ public class UserService {
             }
         }
 
-        user.setCreatedAt(LocalDateTime.now());
+        user.setCreatedAt(Instant.now());
         userRepository.save(user);
         return MessageCode.USER_REGISTRATION_SUCCESS.getMessage();
     }

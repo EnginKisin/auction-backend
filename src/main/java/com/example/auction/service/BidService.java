@@ -1,6 +1,6 @@
 package com.example.auction.service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +34,7 @@ public class BidService {
             throw new IllegalArgumentException(MessageCode.BID_OWN_AUCTION_NOT_ALLOWED.getMessage());
         }
 
-        if (!auction.getIsActive() || LocalDateTime.now().isAfter(auction.getEndTime())) {
+        if (!auction.getIsActive() || Instant.now().isAfter(auction.getEndTime())) {
             throw new IllegalArgumentException(MessageCode.AUCTION_INACTIVE.getMessage());
         }
 
@@ -47,7 +47,7 @@ public class BidService {
         }
 
         bid.setAuction(auction);
-        bid.setBidTime(LocalDateTime.now());
+        bid.setBidTime(Instant.now());
         auction.setHighestBid(bid.getAmount());
         auction.setHighestBidder(bid.getBidder());
 
